@@ -1,0 +1,36 @@
+I want to generate the following program in async python 3 and openai:
+
+* Load problem dataset from a csv file from ./promplems/codeforces.csv file. The csv file has the following columns: contest,problem_name,problem_statement,problem_tags
+* For each problem_name and problem statement do the following
+    1. reset context, which is a list of messages provided and received from gpt-4o. Always update context on each gpt-4o call
+    2. do chain-of-thought: ask gpt-4o to generate step-by-step plan on how to solve the problem.
+    3. ask gpt-4o to generate runnable solution code in python
+    4. ask gpt-4o to generate runnable verification program to verify the solution. If solution is correct, it outputs "correct", otherwise "incorrect".
+    5. run generated solution python code in python interpreter and read the output
+    6. run verification code in python interpreter providing the output
+    7. if the output of verification program is "correct", store a solution code to a file in ./solutions directory under ?problem_name?.py and move to next problem (step 1)
+    8. if the output of verification program is "incorrect", add a message to context saying that the answer was incorrect and move to step 2, unless already iterated 3 times
+    9. if program exited due to an error, add the error stack to context and go to step 2, unless already iterated 3 times
+    10. if program timeouts (5sec), add that timeout information to context and go to step 2, unless already iterated 3 times
+
+Notes:
+
+OpenAI API key is provided in environment variable. 
+
+The code program should be python 3 and async. 
+
+Here is an example of openai python library usage (as of 2025), use it:
+
+from openai import AsyncOpenAI
+client = OpenAI()
+
+completion = await client.chat.completions.create(
+  model="gpt-4o",
+  messages=[
+    {"role": "developer", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Hello!"}
+  ]
+)
+
+print(completion.choices[0].message)
+
