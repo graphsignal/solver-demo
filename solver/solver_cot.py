@@ -18,7 +18,7 @@ logger.setLevel(logging.DEBUG)
 # import and initialize Graphsignal
 # add GRAPSIGNAL_API_KEY to your environment variables
 import graphsignal
-graphsignal.configure(deployment='solver-demo', debug_mode=True)
+graphsignal.configure(deployment='solver-cot', debug_mode=True)
 
 
 # Constants
@@ -44,7 +44,7 @@ async def process_problem(problem: Dict[str, str]):
     problem_tags = problem.get('problem_tags', '')
     problem_id = f"{contest}-{problem_name}"
 
-    graphsignal.set_context_tag('problem', problem_id, append_uuid=True)
+    graphsignal.set_context_tag('task_id', problem_id, append_uuid=True)
 
     logger.debug(f"Processing problem: {problem_id}")
 
@@ -70,7 +70,8 @@ async def process_problem(problem: Dict[str, str]):
             solution_code = await chat.generate_code()
             chat.assistant(solution_code)
 
-            solution_stdout, solution_stderr = await execute_code(solution_code, timeout=TIMEOUT_SECONDS)
+            with graphsignal.trace('execute_code'):
+                solution_stdout, solution_stderr = await execute_code(solution_code, timeout=TIMEOUT_SECONDS)
             logger.debug(f"Verification result for {problem_id}: {solution_stdout}")
             if 'verified' in solution_stdout.lower():
                 with solution_file.open('w', encoding='utf-8') as f:
@@ -89,7 +90,7 @@ async def process_problem(problem: Dict[str, str]):
             if attempt == MAX_RETRIES:
                 logger.debug(f"Max retries reached for problem: {problem_id}. Moving to next problem.")
 
-    graphsignal.remove_context_tag('problem')
+    graphsignal.remove_context_tag('task_id')
 
     await chat.close()
 

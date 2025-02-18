@@ -12,42 +12,50 @@ In a single line print "YES", if the given rectangles form a square, or "NO" oth
 Tags: implementation,*1500
 '''
 
-def form_square(rectangles):
+def check_if_rectangles_form_square(rectangles):
     if not rectangles:
         return "NO"
     
-    # Step 1: Find the bounding box of all rectangles
-    min_x = min(rect[0] for rect in rectangles)
-    max_x = max(rect[2] for rect in rectangles)
-    min_y = min(rect[1] for rect in rectangles)
-    max_y = max(rect[3] for rect in rectangles)
-    
-    # Step 2: Check if the bounding box is square
-    side_x = max_x - min_x
-    side_y = max_y - min_y
-    if side_x != side_y:
-        return "NO"
-    
-    # Step 3: Calculate bounding box and rectangles area
-    bounding_box_area = side_x * side_y
-    total_rectangles_area = sum((rect[2] - rect[0]) * (rect[3] - rect[1]) for rect in rectangles)
+    min_x = float('inf')
+    min_y = float('inf')
+    max_x = float('-inf')
+    max_y = float('-inf')
+    total_area = 0
 
-    # Step 4: Validate if total area matches
-    if total_rectangles_area == bounding_box_area:
-        return "YES"
+    for x1, y1, x2, y2 in rectangles:
+        min_x = min(min_x, x1)
+        min_y = min(min_y, y1)
+        max_x = max(max_x, x2)
+        max_y = max(max_y, y2)
+        total_area += (x2 - x1) * (y2 - y1)
+
+    # Calculate the side length of the bounding square
+    side_length = max_x - min_x
+
+    # Check if bounding box is a square
+    if side_length == (max_y - min_y):
+        # Calculate the area of the bounding box assumed square
+        if total_area == side_length * side_length:
+            return "YES"
+
+    return "NO"
+
+# Verification function
+
+def verify_solution(test_case, expected):
+    result = check_if_rectangles_form_square(test_case)
+    if result == expected:
+        print("verified")
     else:
-        return "NO"
+        print(f"Incorrect: Expected {expected}, but got {result}")
 
-# Test the function with a verification call
+# Test case
 rectangles_test = [
-    (0, 0, 2, 2),
-    (2, 0, 4, 2),
-    (0, 2, 4, 4)
+    (0, 0, 2, 2), 
+    (0, 2, 2, 4), 
+    (2, 0, 4, 2), 
+    (2, 2, 4, 4)
 ]
-expected_result = "YES"
-actual_result = form_square(rectangles_test)
 
-if actual_result == expected_result:
-    print('verified')
-else:
-    print(f'incorrect result: expected {expected_result}, got {actual_result}')
+# This should form a perfect 4x4 square
+verify_solution(rectangles_test, "YES")
