@@ -14,55 +14,49 @@ Write n lines, each line should contain a cell coordinates in the other numerati
 Tags: implementation,math,*1600
 '''
 
-def solution(n, coordinates):
-    def to_rx_cy(coord):
-        # "Letter-Number" to "RxCy": e.g., BC23 to R23C55
-        i = 0
-        while not coord[i].isdigit():
-            i += 1
-        column_letters = coord[:i]
-        row_number = coord[i:]
-        # Convert column letters to number
-        column_number = 0
-        for letter in column_letters:
-            column_number = column_number * 26 + (ord(letter) - ord('A') + 1)
-        return f"R{row_number}C{column_number}"
+import re
 
-    def to_letter_number(coord):
-        # "RxCy" to "Letter-Number": e.g., R23C55 to BC23
-        rc_split = coord.split('C')
-        row_number = rc_split[0][1:]  # Remove the 'R'
-        column_number = int(rc_split[1])
-        # Convert column number to letters
-        column_letters = ''
-        while column_number > 0:
-            column_number -= 1
-            letter = chr(column_number % 26 + ord('A'))
-            column_letters = letter + column_letters
-            column_number //= 26
-        return f"{column_letters}{row_number}"
+def excel_to_rxcy(column_alpha):
+    col_number = 0
+    for char in column_alpha:
+        col_number = col_number * 26 + (ord(char) - ord('A') + 1)
+    return col_number
 
-    results = []
+
+def rxcy_to_excel(col_number):
+    column_alpha = []
+    while col_number > 0:
+        col_number -= 1
+        column_alpha.append(chr(col_number % 26 + ord('A')))
+        col_number //= 26
+    return ''.join(reversed(column_alpha))
+
+
+def convert_coordinates(n, coordinates):
+    converted = []
     for coord in coordinates:
-        if coord[0] == 'R' and 'C' in coord:
-            results.append(to_letter_number(coord))
-        else:
-            results.append(to_rx_cy(coord))
-    return results
+        if re.match(r'^[A-Z]+[0-9]+$', coord):
+            # Excel-style to RXCY-style
+            match = re.match(r'^([A-Z]+)([0-9]+)$', coord)
+            column_alpha, row = match.groups()
+            col_number = excel_to_rxcy(column_alpha)
+            converted.append(f'R{row}C{col_number}')
+        elif re.match(r'^R[0-9]+C[0-9]+$', coord):
+            # RXCY-style to Excel-style
+            match = re.match(r'^R([0-9]+)C([0-9]+)$', coord)
+            row, col_number = match.groups()
+            col_number = int(col_number)
+            column_alpha = rxcy_to_excel(col_number)
+            converted.append(f'{column_alpha}{row}')
+    return converted
 
-# Verification test case
-input_n = 2
-input_coordinates = ['BC23', 'R23C55']  # BC23 should convert to R23C55 and vice versa
-expected_output = ['R23C55', 'BC23']
+# Verification
+n = 3
+coordinates = ['BC23', 'R23C55', 'A1']
+expected_output = ['R23C55', 'BC23', 'R1C1']
+output = convert_coordinates(n, coordinates)
 
-# Call the solution function
-actual_output = solution(input_n, input_coordinates)
-
-# Verification step
-output_verified = actual_output == expected_output
-
-# Print the result of verification
-if output_verified:
-    print("verified")
+if output == expected_output:
+    print('verified')
 else:
-    print(f"Failed: expected {expected_output}, but got {actual_output}")
+    print(f'incorrect, got {output}, expected {expected_output}')

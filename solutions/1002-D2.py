@@ -14,31 +14,34 @@ Your code should have the following signature:
 Tags: *1300
 '''
 
-def oracle_function(a, x):
-    # Calculate the dot product (bitwise AND followed by modulo 2 sum)
-    return sum(xi & ai for xi, ai in zip(x, a)) % 2
+def classical_oracle_simulation(n, a):
+    """
+    Simulates the oracle by flipping the sign of the amplitude for state |a>.
+    """
+    state_space = [(bin(i)[2:].zfill(n), 1) for i in range(2**n)]  # Each state initialization in binary
+    
+    # Simulate phase flip for state matching a
+    for i, (state, amplitude) in enumerate(state_space):
+        if all(int(state[j]) == a[j] for j in range(n)):
+            state_space[i] = (state, -amplitude)
+    
+    return state_space
 
+def verify_oracle():
+    n = 3  # Number of bits
+    a = [1, 0, 1]  # State to flip the phase
+    
+    result = classical_oracle_simulation(n, a)
+    
+    expected_outcome = [(state, -amp) if state == ''.join(map(str, a)) else (state, amp)
+                        for (state, amp) in [(bin(i)[2:].zfill(n), 1) for i in range(2**n)]]
 
-def test_oracle_function():
-    # Define test parameters
-    a = [1, 0, 1]
-    x = [1, 0, 1]  # This is equivalent to the binary representation |101⟩
-    
-    # Calculate the expected output
-    expected_parity = oracle_function(a, x)
-    
-    # The expected result is obtained from xor of x and a
-    # In binary, 101 AND 101 = 101, and sum bits modulo 2
-    # 1+0+1 = 2, 2 mod 2 = 0
-    # So, expected parity should be 0
-    expected_result = 0
-    
-    # Perform check
-    if expected_parity == expected_result:
-        print("verified")
+    if result == expected_outcome:
+        print('verified')
     else:
-        print("incorrect result")
-        print(f"Expected parity: {expected_result}, but got: {expected_parity}")
+        print('Oracle verification failed.')
+        print('Expected:', expected_outcome)
+        print('Actual:', result)
 
-# Run the test
-test_oracle_function()
+# Run the verification
+verify_oracle()

@@ -18,71 +18,71 @@ Tags: dfsandsimilar,graphs,trees,*2100
 
 from collections import defaultdict
 
-# Tarjan's algorithm for finding bridges in an undirected graph
-def find_bridges(n, edges):
-    graph = defaultdict(list)
-    for u, v in edges:
-        graph[u].append(v)
-        graph[v].append(u)
+# Helper function to add an edge to the graph
+def add_edge(graph, u, v):
+    graph[u].append(v)
+    graph[v].append(u)
 
-    time = [0]  # Global timer for discovery times
+# A helper function to find bridges in a graph using DFS
+def bridge_dfs(u, visited, parent, low, disc, graph, bridges, time):
+    visited[u] = True
+    disc[u] = low[u] = time[0]
+    time[0] += 1
+
+    for v in graph[u]:
+        if not visited[v]:
+            parent[v] = u
+            bridge_dfs(v, visited, parent, low, disc, graph, bridges, time)
+
+            low[u] = min(low[u], low[v])
+
+            if low[v] > disc[u]:
+                bridges.append((u, v))
+        elif v != parent[u]:
+            low[u] = min(low[u], disc[v])
+
+# The function that implements the solution algorithm
+def maximum_bosses(n, m, edges):
+    graph = defaultdict(list)
+
+    for x, y in edges:
+        add_edge(graph, x, y)
+
+    visited = [False] * (n + 1)
     disc = [-1] * (n + 1)
     low = [-1] * (n + 1)
-    visited = [False] * (n + 1)
+    parent = [-1] * (n + 1)
     bridges = []
-
-    def dfs(u, parent):
-        visited[u] = True
-        disc[u] = low[u] = time[0]
-        time[0] += 1
-
-        for v in graph[u]:
-            if v == parent:
-                continue
-
-            if not visited[v]:
-                dfs(v, u)
-
-                low[u] = min(low[u], low[v])
-
-                if low[v] > disc[u]:
-                    bridges.append((u, v))
-            else:
-                low[u] = min(low[u], disc[v])
+    time = [0]
 
     for i in range(1, n + 1):
         if not visited[i]:
-            dfs(i, -1)
+            bridge_dfs(i, visited, parent, low, disc, graph, bridges, time)
 
-    return bridges
-
-# Solution function
-def max_number_of_bosses(n, m, passages):
-    # Find all bridges in the graph
-    bridges = find_bridges(n, passages)
-    # The number of bridges is the maximum number of bosses that can be placed
     return len(bridges)
 
-# Verify the solution with a known test case
-def verify_solution():
-    # Example graph with 5 locations and 5 passages
-    # The graph is a chain: 1-2-3-4-5
-    n = 5
-    m = 5
-    passages = [
+# Verification test case
+def verify_maximum_bosses():
+    # Sample Input: Graph with 5 nodes and 5 edges, having 2 bridges
+    n, m = 5, 5
+    edges = [
         (1, 2),
-        (2, 3),
+        (1, 3),
         (3, 4),
+        (3, 5),
         (4, 5),
-        (2, 4)  # Extra passage to maintain connectivity
     ]
-    expected_number_of_bosses = 2  # Bridges: (1,2), (4,5)
+    expected_result = 2  # The bridges are (1, 2) and (3, 4)
 
-    result = max_number_of_bosses(n, m, passages)
-
-    if result == expected_number_of_bosses:
-        print('verified')
+    actual_result = maximum_bosses(n, m, edges)
+    
+    if actual_result == expected_result:
+        print("verified")
     else:
-        print(f'Incorrect: expected {expected_number_of_bosses}, got {result}')
+        print(f"Failed: Expected {expected_result}, but got {actual_result}.")
 
-verify_solution()
+# Run verification
+def test_solution():
+    verify_maximum_bosses()
+
+test_solution()

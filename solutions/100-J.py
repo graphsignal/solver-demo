@@ -15,35 +15,36 @@ Tags: *specialproblem,greedy,math,*2400
 '''
 
 def min_colors_for_intervals(intervals):
-    # Step 1: Transform each interval into (start_time, end_time, type) events.
-    events = []
-    for start, end in intervals:
-        events.append((start, 1))  # +1 when an interval starts
-        events.append((end, -1))   # -1 when an interval ends
+    # Sort the intervals first by starting point, then by end point descending
+    intervals.sort(key=lambda x: (x[0], -x[1]))
+    
+    # This will hold the end points of the increasing subsequence
+    lis = []
+    
+    # Find the length of the longest increasing subsequence of end points
+    for _, end in intervals:
+        # Find position to replace in lis or extend it.
+        low, high = 0, len(lis)
+        while low < high:
+            mid = (low + high) // 2
+            if lis[mid] < end:
+                low = mid + 1
+            else:
+                high = mid
+        if low < len(lis):
+            lis[low] = end
+        else:
+            lis.append(end)
+    
+    # Length of lis is the answer
+    return len(lis)
 
-    # Step 2: Sort events by time; if times tie, sort by type (-1 should come before +1)
-    events.sort(key=lambda x: (x[0], x[1]))
+# Verification call
+intervals = [(-3, 3), (0, 1), (-2, 0)] # Sample test case
+expected_output = 2
+result = min_colors_for_intervals(intervals)
 
-    # Step 3: Sweep through events to find maximum overlaps
-    current_overlap = 0
-    max_overlap = 0
-
-    for event in events:
-        current_overlap += event[1]  # Add 1 if start, subtract 1 if end
-        max_overlap = max(max_overlap, current_overlap)
-
-    return max_overlap
-
-# Verification function
-
-def verify():
-    # Test case: Expect max overlap/clique is 3 for below intervals.
-    intervals = [(1, 4), (2, 5), (3, 6), (7, 8)]  # At time 3, three intervals overlap.
-    expected_result = 3 
-    result = min_colors_for_intervals(intervals)
-    if result == expected_result:
-        print("verified")
-    else:
-        print(f"Failed: Expected {expected_result}, but got {result}")
-
-verify()
+if result == expected_output:
+    print("verified")
+else:
+    print(f"Test failed: expected {expected_output}, got {result}")

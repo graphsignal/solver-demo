@@ -30,66 +30,65 @@ In the third example lists are equal.
 Tags: greedy,implementation,*1200
 '''
 
-def solve_tshirt_problem(n, a, b):
-    from collections import Counter
-    
-    # Count frequencies of each size in both lists
-    counter_a = Counter(a)
-    counter_b = Counter(b)
-    
-    # Calculate differences
-    extra_a = counter_a - counter_b  # Sizes in `a` that are extra
-    extra_b = counter_b - counter_a  # Sizes in `b` that are needed
-    
-    # Initialize changes counter
-    changes = 0
-    
-    # Convert to lists of sizes with counts needed
-    extra_a_items = list(extra_a.items())
-    extra_b_items = list(extra_b.items())
+from collections import defaultdict
 
-    # Create variables to track current indices in extra_a and extra_b
-    i, j = 0, 0
+# Function to determine the minimum number of changes required to transform list a into list b
 
-    while i < len(extra_a_items) and j < len(extra_b_items):
-        a_size, a_count = extra_a_items[i]
-        b_size, b_count = extra_b_items[j]
+def min_changes_to_match(a, b):
+    # Count occurrences of each size in list a and list b
+    count_a = defaultdict(int)
+    count_b = defaultdict(int)
+    
+    for size in a:
+        count_a[size] += 1
+    for size in b:
+        count_b[size] += 1
         
-        # Find the minimum count we can change for the current pair
-        min_count = min(a_count, b_count)
+    # Calculate the total number of changes required
+    changes = 0
+    all_sizes = set(count_a.keys()).union(set(count_b.keys()))
+    
+    for size in all_sizes:
+        if size in count_a or size in count_b:
+            changes += abs(count_a[size] - count_b[size])
 
-        # Calculate the number of changes: since the size strings are the same length, the change count is for each character
-        changes += min_count * len(a_size)
+    # Each change fixes two mismatches, so divide by 2
+    return changes // 2
 
-        # Update the counts
-        a_count -= min_count
-        b_count -= min_count
+# Test the solution function
 
-        # If we've used up all counts for a_size, move to the next extra_a
-        if a_count == 0:
-            i += 1
-        else:
-            extra_a_items[i] = (a_size, a_count)  # Update the count
+def test_solution():
+    # Test case 1
+    a1 = ["M", "S", "XS"]
+    b1 = ["S", "M", "L"]
+    expected1 = 2  # Change one "M" to "S" and one "S" to "L"
+    result1 = min_changes_to_match(a1, b1)
+    if result1 == expected1:
+        print('Test 1 verified')
+    else:
+        print(f'Test 1 failed: expected {expected1}, but got {result1}')
 
-        # If we've fulfilled all needs for b_size, move to the next extra_b
-        if b_count == 0:
-            j += 1
-        else:
-            extra_b_items[j] = (b_size, b_count)  # Update the count
+    # Test case 2
+    a2 = ["XXL", "XXXL", "L"]
+    b2 = ["XXL", "L", "M"]
+    expected2 = 1  # Change "XXXL" to "M"
+    result2 = min_changes_to_match(a2, b2)
+    if result2 == expected2:
+        print('Test 2 verified')
+    else:
+        print(f'Test 2 failed: expected {expected2}, but got {result2}')
+    
+    # Test case 3
+    a3 = ["L", "M"]
+    b3 = ["M", "L"]
+    expected3 = 0  # Lists are already equivalent
+    result3 = min_changes_to_match(a3, b3)
+    if result3 == expected3:
+        print('Test 3 verified')
+    else:
+        print(f'Test 3 failed: expected {expected3}, but got {result3}')
 
-    return changes
+# Run the test
 
-# Test the function with a given test case
-n = 5
-previous_year = ['M', 'S', 'XS', 'XL', 'XXXL']
-current_year = ['S', 'XS', 'M', 'L', 'XXXL']
-
-# Expected result is 2
-actual_result = solve_tshirt_problem(n, previous_year, current_year)
-expected_result = 2
-
-# Verification
-if actual_result == expected_result:
-    print('verified')
-else:
-    print(f'verification failed: expected {expected_result}, got {actual_result}')
+# The code is designed not to take external input, just to run these tests
+test_solution()

@@ -12,35 +12,41 @@ Your code should have the following signature:
 Tags: *specialproblem,*1400
 '''
 
-def classical_oracle(N, k, binary_string):
+def simulate_oracle(N, k, input_state):
     """
-    Simulate the behavior of a quantum oracle that checks the k-th bit.
+    Simulates a quantum oracle output by checking the value of k-th qubit in the input state.
     
-    Args:
-    - N: The number of bits (length of the binary string).
-    - k: The index of the bit to query (0-indexed).
-    - binary_string: A binary string of length N representing the input.
-    
-    Returns:
-    - The value of the k-th bit (0 or 1).
+    :param N: Number of qubits, should equal the length of input_state.
+    :param k: Index of the qubit to be checked.
+    :param input_state: A binary string representing state of qubits like '0001'.
+    :return: The value of the k-th qubit (0 or 1).
     """
-    # Ensure k is within bounds
-    if k < 0 or k >= N:
-        raise ValueError("k is out of bounds for the binary string provided.")
-    # Return the k-th bit
-    return int(binary_string[k])
-
-
-def verify_classical_oracle(N, k, binary_string, expected_result):
-    # Execute the classical Oracle
-    result = classical_oracle(N, k, binary_string)
+    if len(input_state) != N:
+        raise ValueError("Length of input_state must be equal to N.")
     
-    # Print verification result
-    if result == expected_result:
-        print('verified')
+    return input_state[k]
+
+def verify_simulation():
+    N = 4
+    k = 2
+    test_cases = {
+        '0000': '0',
+        '1111': '1',
+        '1010': '1',
+        '0101': '0'
+    }
+    all_verified = True
+    for input_state, expected in test_cases.items():
+        result = simulate_oracle(N, k, input_state)
+        if result == expected:
+            print(f'Test with input_state={input_state} verified.')
+        else:
+            print(f'Mismatch for input_state={input_state}: expected {expected}, got {result}.')
+            all_verified = False
+
+    if all_verified:
+        print('All cases verified.')
     else:
-        print(f'incorrect: expected {expected_result}, got {result}')
+        print('Some cases failed verification.')
 
-# Example verification call
-# For N = 3, k = 1, binary_string = '010' (which should make the result 1), expected_result = 1
-verify_classical_oracle(3, 1, '010', 1)
+verify_simulation()

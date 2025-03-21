@@ -14,38 +14,39 @@ Your code should have the following signature:
 Tags: *1500
 '''
 
-def quantum_oracle_example(x):
-    # An example oracle function that uses a predefined `a`
-    # Let's assume N=3 for example purposes, and the array a is [1, 0, 1]
+def oracle(x, y):
+    # Example oracle for testing (not the real quantum oracle)
+    # Let's assume a = [1, 0, 1]
     a = [1, 0, 1]
-    # Compute the function f(x) = (sum(a_i * x_i) for i in range(N)) mod 2
-    return sum(a_i * x_i for a_i, x_i in zip(a, x)) % 2
+    dot_product = sum(a[i] * x[i] for i in range(len(a)))
+    return dot_product % 2
 
 
-def reconstruct_a_with_oracle(quantum_oracle, N):
-    # Reconstruct the array `a` using the given oracle
-    a = []
+def find_a(N, oracle):
+    # Initialize an array to hold the solution a
+    a = [0] * N
+
+    # Query the oracle for each bit position
     for i in range(N):
-        x = [0] * N  # Start with all zeroes
-        x[i] = 1     # Set the i-th position to 1
-        parity = quantum_oracle(x)
-        a.append(parity)  # Append the result, which is a_i
+        # Create a query vector with 1 in the i-th position and 0 elsewhere
+        x = [0] * N
+        x[i] = 1
+
+        # Call oracle with this vector and y=0
+        response = oracle(x, 0)
+
+        # The response determines the value of a[i]
+        a[i] = response
 
     return a
 
-
-# Test our solution with the oracle
-N = 3  # Length of the array a
-
-# Expected result is a reconstruction of the array [1, 0, 1]
+# Test the implemented function
 expected = [1, 0, 1]
-
-# Run the function with the example quantum oracle
-actual = reconstruct_a_with_oracle(quantum_oracle_example, N)
+N = 3
+result = find_a(N, oracle)
 
 # Verification
-if actual == expected:
-    print("verified")
+if result == expected:
+    print('verified')
 else:
-    print("Result not matching. Expected:", expected, "Actual:", actual)
-    print("Possible error: In the input to the oracle or the oracle implementation itself.")
+    print(f'Incorrect result. Actual: {result}, Expected: {expected}. This could happen if the implementation does not correctly deduce each bit of `a`.')

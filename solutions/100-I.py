@@ -13,23 +13,31 @@ Tags: *specialproblem,geometry,math,*1500
 import math
 
 def rotate_point(k, x, y):
-    # Convert k degrees to radians
-    theta_radians = k * (math.pi / 180)
+    # Convert degrees to radians
+    radians = k * math.pi / 180
     
-    # Apply the rotation matrix
-    x_prime = x * math.cos(theta_radians) - y * math.sin(theta_radians)
-    y_prime = x * math.sin(theta_radians) + y * math.cos(theta_radians)
+    # Calculate the new coordinates using rotation formulas
+    x_new = x * math.cos(radians) - y * math.sin(radians)
+    y_new = x * math.sin(radians) + y * math.cos(radians)
+    
+    return (x_new, y_new)
 
-    return x_prime, y_prime
+# Test the function with a verification step
+# Test case: Rotate 90 degrees counter-clockwise
+k_test = 90
+x_test, y_test = 1, 0 # point on x-axis
+expected_result = (0, 1) # expected point on y-axis
 
-# Verification
-# Rotate (1, 0) by 90 degrees counter-clockwise. Expected result: (0, 1)
-expected_x_prime = 0
-expected_y_prime = 1
-rotated_x, rotated_y = rotate_point(90, 1, 0)
+# Call the solution function
+actual_result = rotate_point(k_test, x_test, y_test)
 
-# Checking if the result is within a small tolerance
-if math.isclose(rotated_x, expected_x_prime, abs_tol=0.1) and math.isclose(rotated_y, expected_y_prime, abs_tol=0.1):
+# Verify the result
+relative_error_allowance = 0.1
+
+x_error = abs(actual_result[0] - expected_result[0])
+y_error = abs(actual_result[1] - expected_result[1])
+
+if x_error < relative_error_allowance and y_error < relative_error_allowance:
     print('verified')
 else:
-    print(f'Error: Expected ({expected_x_prime}, {expected_y_prime}), got ({rotated_x}, {rotated_y})')
+    print(f'Incorrect result. Actual: {actual_result}, Expected: {expected_result}')

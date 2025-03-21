@@ -8,50 +8,55 @@ Output the answer to the problem.
 Tags: implementation,*900
 '''
 
-def calculate_total_power(n, P1, P2, P3, T1, T2, intervals):
+def calculate_total_power(n, P1, P2, P3, T1, T2, usage_periods):
     total_power = 0
-    current_time = intervals[0][0]
-
-    # Process each interval
-    for idx in range(n):
-        li, ri = intervals[idx]
-
-        if idx > 0:
-            # Calculate the inactive period between previous end and current start
-            inactive_duration = li - intervals[idx-1][1]
-
-            # Compute power consumption during inactive period
-            if inactive_duration > 0:
-                # Idle time less than or equal to T1
-                if inactive_duration <= T1:
-                    total_power += inactive_duration * P1
+    last_interaction_time = 0
+    
+    # Process each work period
+    for i in range(n):
+        li, ri = usage_periods[i]
+        
+        # Compute the idle time before the current period starts
+        idle_time = li - last_interaction_time
+        
+        # Calculate power consumption during the idle period
+        if idle_time > 0:
+            # If idle time is less than T1, only normal mode consumed
+            if idle_time <= T1:
+                total_power += idle_time * P1
+            else:
+                # If idle time is greater than T1, it crosses to screensaver mode
+                total_power += T1 * P1
+                remaining_time = idle_time - T1
+                
+                # If remaining idle time is less than T2, all time in screen saver mode
+                if remaining_time <= T2:
+                    total_power += remaining_time * P2
                 else:
-                    # First T1 minutes: P1 watts
-                    total_power += T1 * P1
-                    remaining_time = inactive_duration - T1
-
-                    # Next up to T2 minutes: P2 watts
-                    if remaining_time <= T2:
-                        total_power += remaining_time * P2
-                    else:
-                        total_power += T2 * P2
-                        remaining_time -= T2
-
-                        # Remaining time: P3 watts
-                        total_power += remaining_time * P3
-
-        # Add power consumption for the current active interval
-        total_power += (ri - li) * P1
-
+                    # If remaining time is greater than T2, some time is in sleep mode
+                    total_power += T2 * P2
+                    sleep_time = remaining_time - T2
+                    total_power += sleep_time * P3
+        
+        # Add power for active usage period (normal mode)
+        active_time = ri - li
+        total_power += active_time * P1
+        
+        # Update the last interaction time to the end of this period
+        last_interaction_time = ri
+    
     return total_power
 
-# Test the function with sample input
-n, P1, P2, P3, T1, T2 = 1, 10, 5, 1, 10, 20
-intervals = [(0, 30)]
-expected_output = (30 * P1)  # Active period 0 to 30
-result = calculate_total_power(n, P1, P2, P3, T1, T2, intervals)
+# Test the solution function with a sample test case
+# Example test case:
+# n, P1, P2, P3, T1, T2 = 1, 10, 5, 2, 5, 5
+# Usage periods: [[0, 10]]
+# Expected output = 10 * 10 = 100 watts as there's no idle time
+expected_output = 100
+actual_output = calculate_total_power(1, 10, 5, 2, 5, 5, [[0, 10]])
 
-if result == expected_output:
-    print("verified")
+# Check the output
+if actual_output == expected_output:
+    print('verified')
 else:
-    print(f"Test failed: expected {expected_output}, got {result}")
+    print(f'Incorrect: Got {actual_output}, Expected {expected_output}')

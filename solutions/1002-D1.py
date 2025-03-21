@@ -12,41 +12,28 @@ Your code should have the following signature:
 Tags: *1200
 '''
 
-def classical_oracle(a, x):
-    """
-    Simulates the behavior of a quantum oracle by computing the dot product
-    modulo 2, where the inputs are binary vectors.
+def quantum_oracle_simulation_and_verification(a):
+    n = len(a)
 
-    :param a: List[int], the binary vector a.
-    :param x: List[int], the input binary vector x.
-    :return: int, the result of a dot x mod 2.
-    """
-    dot_product = sum(a_i * x_i for a_i, x_i in zip(a, x))
-    f_x = dot_product % 2
-    return f_x
+    def f(x):
+        # Compute the dot product mod 2 between x and a
+        return sum(int(x[i]) * a[i] for i in range(n)) % 2
 
+    # Check for all possible 2^n input states represented by binary strings
+    for x in range(2 ** n):
+        # Convert x to binary string with leading zeros
+        x_bin = f"{x:0{n}b}"
+        actual_result = f(x_bin)
+        expected_result = sum(int(x_bin[i]) * a[i] for i in range(n)) % 2
+        if actual_result != expected_result:
+            print(f"Verification failed for x = {x_bin}: expected {expected_result}, got {actual_result}")
+            return False
 
-def verify_classical_oracle(a, x, expected_result):
-    """
-    Verifies the oracle by comparing the computed result with the expected result.
+    print("verified")
+    return True
 
-    :param a: List[int], the binary vector a.
-    :param x: List[int], the input binary vector x.
-    :param expected_result: int, the expected result, should be 0 or 1.
-    """
-    result = classical_oracle(a, x)
-    if result == expected_result:
-        print("verified")
-    else:
-        print(f"incorrect: result = {result}, expected = {expected_result}")
-
-# Example parameters for testing
-N = 3
+# Example vector a for testing
 example_a = [1, 0, 1]
-example_x = [0, 0, 1]  # x state to test
 
-# Calculate the expected result manually for verification
-expected_result = (example_a[0]*example_x[0] + example_a[1]*example_x[1] + example_a[2]*example_x[2]) % 2
-
-# Verify the implementation by checking correctness
-verify_classical_oracle(example_a, example_x, expected_result)
+# Run verification
+quantum_oracle_simulation_and_verification(example_a)

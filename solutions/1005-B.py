@@ -22,31 +22,52 @@ In the fourth example, the first character of the second string should be delete
 Tags: bruteforce,implementation,strings,*900
 '''
 
-def min_moves_to_equal(s, t):
-    len_s = len(s)
-    len_t = len(t)
+def min_moves_to_equal_strings(s: str, t: str) -> int:
+    # Initialize the counter for the common suffix length
     common_suffix_length = 0
     
-    # Traverse from the end of both strings
-    i = len_s - 1
-    j = len_t - 1
+    # Indices to iterate from the end of strings s and t
+    i, j = len(s) - 1, len(t) - 1
     
+    # While characters are the same in the suffix
     while i >= 0 and j >= 0 and s[i] == t[j]:
+        # Increment the common suffix length counter
         common_suffix_length += 1
+        # Move to the next characters
         i -= 1
         j -= 1
     
-    # Calculate the minimum moves needed
-    min_moves = len_s + len_t - 2 * common_suffix_length
-    return min_moves
+    # Calculate the number of moves needed
+    moves = (len(s) + len(t) - 2 * common_suffix_length)
+    return moves
 
-# Test case verification
-s = "prefixest"
-t = "latest"
-expected_output = 9
-actual_output = min_moves_to_equal(s, t)
+# Test cases and verification
+# Test case 1
+s1 = "test"
+t1 = "best"
+expected1 = 2
+result1 = min_moves_to_equal_strings(s1, t1)
+assert result1 == expected1, f"Test 1 Failed: Expected {expected1}, got {result1}"
 
-if actual_output == expected_output:
-    print('verified')
-else:
-    print(f'Failed: expected {expected_output}, got {actual_output}')
+# Test case 2
+s2 = "codeforces"
+t2 = "yes"
+expected2 = 9
+result2 = min_moves_to_equal_strings(s2, t2)
+assert result2 == expected2, f"Test 2 Failed: Expected {expected2}, got {result2}"
+
+# Test case 3 (completely different strings)
+s3 = "abcdef"
+t3 = "uvwxyz"
+expected3 = len(s3) + len(t3)
+result3 = min_moves_to_equal_strings(s3, t3)
+assert result3 == expected3, f"Test 3 Failed: Expected {expected3}, got {result3}"
+
+# Test case 4 (one string is a suffix of the other)
+s4 = "abracadabra"
+t4 = "cadabra"
+expected4 = len(s4) - len(t4)
+result4 = min_moves_to_equal_strings(s4, t4)
+assert result4 == expected4, f"Test 4 Failed: Expected {expected4}, got {result4}"
+
+print('verified')

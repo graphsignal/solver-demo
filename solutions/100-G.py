@@ -24,51 +24,85 @@ Write a single string. The name of the new album.
 Tags: *specialproblem,datastructures,implementation,*1800
 '''
 
-def find_album_name(used_names_info, suitable_names):
-    # Transform the list of used names and years into a dictionary
-    used_names = {}
-    for name, year in used_names_info:
-        if name not in used_names or used_names[name] > year:
-            used_names[name] = year
-
-    best_name = None
-    best_year = 2012  # Start with year beyond possible range
-
+def find_album_name(n, used_names, m, suitable_names):
+    # Dictionary to store the used album names and their year
+    used_name_dict = {}
+    for name, year in used_names:
+        used_name_dict[name] = year
+    
+    # Initialize variables for finding the optimal name
+    oldest_year = 2012  # Set to a number greater than any in range
+    chosen_name = None
+    
     for name in suitable_names:
-        if name not in used_names:
-            # Name has not been used
+        if name not in used_name_dict:
+            # Name has not been used, we can use it
             return name
         else:
             # Name has been used, check the year
-            year = used_names[name]
-            if year < best_year:
-                best_year = year
-                best_name = name
-            elif year == best_year:
-                # Select the alphabetically later one
-                if best_name is None or name > best_name:
-                    best_name = name
+            year = used_name_dict[name]
+            if year < oldest_year:
+                oldest_year = year
+                chosen_name = name
+            elif year == oldest_year:
+                # Choose the alphabetically latest name
+                if chosen_name is None or name > chosen_name:
+                    chosen_name = name
+    
+    return chosen_name
 
-    return best_name
+# Test function
 
-# Example verification call
-used_names_info = [
-    ('classical', 1990),
-    ('rock', 1985),
-    ('pop', 2000),
-    ('jazz', 1995),
-    ('blues', 1950)
-]
-suitable_names = ['rock', 'jazz', 'electronic', 'pop', 'opera']
+def test_find_album_name():
+    # Test case 1: No used names, one suitable name
+    n = 0
+    used_names = []
+    m = 1
+    suitable_names = ["newalbum"]
+    result = find_album_name(n, used_names, m, suitable_names)
+    expected = "newalbum"
+    if result == expected:
+        print("Test case 1: verified")
+    else:
+        print(f"Test case 1: Error - actual: {result}, expected: {expected}")
+    
+    # Test case 2: Used names but suitable name not used
+    n = 2
+    used_names = [("oldalbum", 2005), ("ancient", 1900)]
+    m = 2
+    suitable_names = ["newalbum", "ancient"]
+    result = find_album_name(n, used_names, m, suitable_names)
+    expected = "newalbum"
+    if result == expected:
+        print("Test case 2: verified")
+    else:
+        print(f"Test case 2: Error - actual: {result}, expected: {expected}")
 
-# Expected result: 'electronic' because it hasn't been used.
-expected_result = 'electronic'
+    # Test case 3: Suitable names all used
+    n = 3
+    used_names = [("album1", 2000), ("album2", 1990), ("album3", 1985)]
+    m = 3
+    suitable_names = ["album3", "album1", "album2"]
+    result = find_album_name(n, used_names, m, suitable_names)
+    expected = "album3"
+    if result == expected:
+        print("Test case 3: verified")
+    else:
+        print(f"Test case 3: Error - actual: {result}, expected: {expected}")
 
-# Get the result from the function
-actual_result = find_album_name(used_names_info, suitable_names)
+    # Test case 4: Same year, choose alphabetically
+    n = 3
+    used_names = [("aaa", 2000), ("bbb", 2000), ("ccc", 2000)]
+    m = 3
+    suitable_names = ["aaa", "bbb", "ccc"]
+    result = find_album_name(n, used_names, m, suitable_names)
+    expected = "ccc"
+    if result == expected:
+        print("Test case 4: verified")
+    else:
+        print(f"Test case 4: Error - actual: {result}, expected: {expected}")
+    
+    print("All test cases reviewed!")
 
-# Verify the result
-if actual_result == expected_result:
-    print('verified')
-else:
-    print(f'Failed verification. Expected: {expected_result}, but got: {actual_result}')
+# Run test
+test_find_album_name()

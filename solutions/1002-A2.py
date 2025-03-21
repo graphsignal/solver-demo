@@ -14,27 +14,37 @@ Your code should have the following signature:
 Tags: *1300
 '''
 
-def generate_superposition(n, bits):
-    """
-    Prepare a superposition state of |00..0⟩ and the given basis state with a bitstring on N qubits.
+def superpose_qubits(bits):
+    n = len(bits)
+    
+    # Build the base zero state as a string
+    base_state = ''.join('0' for _ in range(n))
+    
+    # Build the target basis state per bits input
+    target_basis_state = ''.join('1' if bit else '0' for bit in bits)
+    
+    # Return the formatted superposition representation
+    superposition_state = f"(|{base_state}⟩ + |{target_basis_state}⟩) / √2"
+    return superposition_state
 
-    :param n: Number of qubits (int)
-    :param bits: Bitstring (list of booleans) (true -> |1⟩, false -> |0⟩)
-    :return: Tuple of strings representing the two states in superposition
-    """
-    zero_state = "|" + "0" * n + "⟩"
-    basis_state = "|" + ''.join(['1' if bit else '0' for bit in bits]) + "⟩"
-    return (zero_state, basis_state)
+# Verification function to test the solution
 
-# Verification
-def verify_superposition():
-    n = 3
-    bits = [True, False, True]  # Corresponds to |101⟩
-    expected_state = ("|000⟩", "|101⟩")
-    actual_state = generate_superposition(n, bits)
-    if actual_state == expected_state:
-        print("verified")
-    else:
-        print(f"Incorrect: expected {expected_state}, but got {actual_state}")
+def verify_superpose_qubits():
+    # Test inputs and expected outputs
+    test_cases = [
+        ([True, False], "(|00⟩ + |10⟩) / √2"),
+        ([False, False, True], "(|000⟩ + |001⟩) / √2"),
+        ([True, True, False, True], "(|0000⟩ + |1101⟩) / √2"),
+        ([False], "(|0⟩ + |0⟩) / √2"),
+        ([True], "(|0⟩ + |1⟩) / √2")
+    ]
 
-verify_superposition()
+    for i, (input_bits, expected) in enumerate(test_cases):
+        result = superpose_qubits(input_bits)
+        if result == expected:
+            print(f"Test case {i+1} verified: {result}")
+        else:
+            print(f"Test case {i+1} failed: expected {expected}, got {result}")
+
+# Run the verification to test the function
+verify_superpose_qubits()

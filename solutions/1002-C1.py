@@ -12,40 +12,39 @@ Your code should have the following signature:
 Tags: *1700
 '''
 
-# Define the states as tuples (representing |ψ⟩ = a|0⟩ + b|1⟩)
-psi_0 = (1, 0)  # This is |0⟩ in computational basis
-psi_1 = (0.9238, 0.3827)  # Approximately rotated state
+import math
+import random
 
-def distinguish_states(qubit):
+# Define the possible states
+angle = math.pi / 8  # A small angle for non-orthogonality
+psi_0 = (1, 0)  # Represents |ψ0⟩
+psi_1 = (math.cos(angle), math.sin(angle))  # Represents |ψ1⟩ which is non-orthogonal to |ψ0⟩
+
+
+def dot_product(v1, v2):
+    """Calculate the dot product of two 2D vectors."""
+    return v1[0] * v2[0] + v1[1] * v2[1]
+
+
+def solution(measurement_result):
     """
-    Distinguishes the state of a given qubit, returning 0 if it is |ψ₀⟩ or 1 if it is |ψ₁⟩.
+    Determines the guessed state returning 0 for |ψ0⟩ and 1 for |ψ1⟩ based on maximum dot product.
+
+    :param measurement_result: A tuple representing the vector after measurement
+    :return: 0 if closer to |ψ0⟩, 1 if closer to |ψ1⟩
     """
-    # Calculate approximate similarity (dot product)
-    prob_0 = qubit[0] * psi_0[0] + qubit[1] * psi_0[1]
-    prob_1 = qubit[0] * psi_1[0] + qubit[1] * psi_1[1]
-    
-    # Decide the state based on which probability**2 is higher
-    return 0 if prob_0**2 > prob_1**2 else 1
-
-# Verification function
-def verify_distinguish_states():
-    # Test with |ψ₀⟩
-    state = psi_0
-    result = distinguish_states(state)
-    expected_result = 0  # Because we provided |ψ₀⟩
-    if result == expected_result:
-        print("verified")
+    if dot_product(measurement_result, psi_0) > dot_product(measurement_result, psi_1):
+        return 0
     else:
-        print(f"Failed: Output {result}, Expected {expected_result}")
+        return 1
 
-    # Test with |ψ₁⟩
-    state = psi_1
-    result = distinguish_states(state)
-    expected_result = 1  # Because we provided |ψ₁⟩
-    if result == expected_result:
-        print("verified")
-    else:
-        print(f"Failed: Output {result}, Expected {expected_result}")
+# Test case
+# Randomly select an initial state
+initial_state = psi_0 if random.choice([True, False]) else psi_1
+expected_result = 0 if initial_state == psi_0 else 1
 
-# Run verification
-verify_distinguish_states()
+# Call the solution function
+actual_result = solution(initial_state)
+
+# Verification
+print('verified' if actual_result == expected_result else f"Test failed: Expected {expected_result}, but got {actual_result}.")

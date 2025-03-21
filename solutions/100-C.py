@@ -12,25 +12,23 @@ Write sum of the two integers. Do not put any leading zeros.
 Tags: *specialproblem,implementation,*1400
 '''
 
-def solution():
-    # Provided test case input
-    a = "12345678901234567890"
-    b = "98765432109876543210"
+def solution(a: str, b: str) -> str:
+    # Convert strings to integers, sum them, and convert the result back to string.
+    return str(int(a) + int(b))
 
-    # Convert inputs to integers
-    int_a = int(a)
-    int_b = int(b)
+# Test the solution function with a test case
+# Test case: let a be a large number within the given constraint, and b another large number.
+a = '1234567890123456789012345678901234567890'
+b = '9876543210987654321098765432109876543210'
 
-    # Compute the sum of the two integers
-    result = int_a + int_b
-    
-    return result
+# Expected output should be the sum of the two large numbers:
+expected_result = '11111111101111111110111111111011111111100'
 
-# Invoke the solution function and verify the output
-expected_result = 111111111011111111100
-actual_result = solution()
+# Call the solution function
+test_result = solution(a, b)
 
-if actual_result == expected_result:
+# Verification
+if test_result == expected_result:
     print('verified')
 else:
-    print(f'Incorrect result. Expected: {expected_result}, but got: {actual_result}')
+    print(f"Incorrect calculation. Actual: {test_result}, Expected: {expected_result}")

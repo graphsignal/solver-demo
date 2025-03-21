@@ -8,48 +8,50 @@ If greedy algorithm collects any sum in an optimal way, output -1. Otherwise out
 Tags: constructivealgorithms,*2600
 '''
 
-def smallest_non_optimal_sum(n, values):
-    max_limit = 10000  # Maximum limit for checking sums
+def find_non_optimal_sum(coin_values):
+    # Step 1: Handle edge cases
+    if len(coin_values) == 1 or coin_values[-1] != 1:
+        return -1
     
-    # Sort values and confirm last is 1 as guaranteed
-    coins = sorted(values, reverse=True)
+    # Step 2: Prepare variables
+    n = len(coin_values)
+    X = 2 * coin_values[0]  # We will explore sums up to double the largest denomination
     
-    # Create a DP array to find the optimal number of coins for each sum
-    dp = [float('inf')] * (max_limit + 1)
-    dp[0] = 0  # Base case: 0 coins needed to make the sum of 0
-    
-    # Fill out the DP table
-    for coin in coins:
-        for amount in range(coin, max_limit + 1):
-            dp[amount] = min(dp[amount], dp[amount - coin] + 1)
-    
-    # Check each possible sum using greedy vs. optimal (DP) method
-    for x in range(1, max_limit + 1):
-        remaining = x
+    # Step 3: Initialize the DP array where dp[x] is the minimum number of coins to make x
+    dp = [float('inf')] * (X + 1)
+    dp[0] = 0
+
+    # Step 4: Fill the DP table
+    for x in range(1, X + 1):
+        for coin in coin_values:
+            if coin <= x:
+                dp[x] = min(dp[x], dp[x - coin] + 1)
+
+    # Step 5: Check each sum from 1 to X with greedy algorithm
+    for x in range(1, X + 1):
         greedy_count = 0
-        
-        # Perform a greedy coin count simulation
-        for coin in coins:
-            if remaining >= coin:
-                greedy_count += remaining // coin
-                remaining %= coin
-        
-        # If greedy requires more coins than dp, it's a non-optimal sum
+        remainder = x
+
+        for coin in coin_values:
+            if coin <= remainder:
+                greedy_count += remainder // coin
+                remainder = remainder % coin
+
+        # Compare greedy approach vs optimal DP approach
         if greedy_count > dp[x]:
             return x
-    
-    # Return -1 if all sums up to max_limit are optimal
+
     return -1
 
-# Test example
-coins_example = [4, 3, 1]
-expected_output = 6
+# Test case based on the problem statement
+coins = [4, 3, 1]
+expected_result = 6
 
-# Invoke the solution
-actual_output = smallest_non_optimal_sum(len(coins_example), coins_example)
+# Run the function with the test case
+actual_result = find_non_optimal_sum(coins)
 
 # Verification
-if actual_output == expected_output:
-    print("verified")
+if actual_result == expected_result:
+    print('verified')
 else:
-    print(f"Failed, expected {expected_output} but got {actual_output}")
+    print(f'Error: expected {expected_result}, but got {actual_result}')

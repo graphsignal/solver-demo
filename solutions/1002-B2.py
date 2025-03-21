@@ -10,32 +10,59 @@ Your code should have the following signature:
 Tags: *1600
 '''
 
+import random
+
+# Define the possible states
+GHZ_STATE = "GHZ"
+W_STATE = "W"
+
+# Solution function to determine the state
+# Since we cannot truly simulate quantum mechanisms, we will
+# simulate as if the function is receiving the measurements directly.
 def determine_state(qubits):
-    num_ones = sum(qubits)  # Sum the ones from a "measurement" of qubits
-    if num_ones == 0 or num_ones == len(qubits):
-        return 0  # GHZ state is detected
-    elif num_ones == 1:
-        return 1  # W state is detected
+    # Count how many are measured as 1
+    count_of_ones = sum(qubits)
+    
+    # If exactly one qubit is 1, it's a W state
+    if count_of_ones == 1:
+        return 1
     else:
-        raise ValueError("This situation should not happen based on the problem description.")
+        # Otherwise, it's a GHZ state (all 0s or all 1s)
+        return 0
 
-# Verification call
-# Test with a GHZ state example (all qubits are 0)
-test_qubits_ghz = [0, 0, 0, 0]  # Expected to return 0 (GHZ state)
-result_ghz = determine_state(test_qubits_ghz)
+# Function to simulate qubit measurements for testing
+# Since this is a mock simulation, we'll assume all qubits derive either
+# from a GHZ state or W state directly
 
-# Test with a W state example (exactly one qubit is 1)
-test_qubits_w = [1, 0, 0, 0]  # Expected to return 1 (W state)
-result_w = determine_state(test_qubits_w)
+def simulate_measurement(state, n):
+    if state == GHZ_STATE:
+        # For GHZ, we randomly choose between all 0s or all 1s
+        return [random.choice([0, 1])] * n
+    elif state == W_STATE:
+        # For W, we place a 1 in a random position and 0 elsewhere
+        qubits = [0] * n
+        qubits[random.randint(0, n - 1)] = 1
+        return qubits
 
-# Check results and print verification
-verified_ghz = (result_ghz == 0)
-verified_w = (result_w == 1)
+# Test the determine_state function
 
-if verified_ghz and verified_w:
-    print('verified')
+# Simulate measurement for GHZ state
+n_qubits = 4
+measured_qubits_ghz = simulate_measurement(GHZ_STATE, n_qubits)
+result_ghz = determine_state(measured_qubits_ghz)
+
+# Verify GHZ state result
+if result_ghz == 0:
+    print("verified")
 else:
-    if not verified_ghz:
-        print(f'Incorrect for GHZ test. Result: {result_ghz}, Expected: 0')
-    if not verified_w:
-        print(f'Incorrect for W test. Result: {result_w}, Expected: 1')
+    print(f"GHZ State Test Failed: Expected 0, got {result_ghz}")
+
+# Simulate measurement for W state
+measured_qubits_w = simulate_measurement(W_STATE, n_qubits)
+result_w = determine_state(measured_qubits_w)
+
+# Verify W state result
+if result_w == 1:
+    print("verified")
+else:
+    print(f"W State Test Failed: Expected 1, got {result_w}")

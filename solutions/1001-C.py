@@ -10,27 +10,29 @@ Your code should have the following signature:
 Tags: *specialproblem,*1400
 '''
 
-def create_ghz_state(N):
-    # Generate GHZ state as a list of strings
-    ghz_state = []
-    zeroes = '0' * N
-    ones = '1' * N
-    ghz_state.append(zeroes)
-    ghz_state.append(ones)
-    return ghz_state
+def generate_ghz_state_vector(n):
+    # Create an empty state list initialized to zero
+    state_vector = [0] * (2**n)
+    # Set the initial and final states to 1/sqrt(2) to simulate the GHZ state
+    state_vector[0] = 1
+    state_vector[-1] = 1
+    return state_vector
 
 
-def verify_ghz_state(N):
-    expected_zeroes = '0' * N
-    expected_ones = '1' * N
-    expected_state = [expected_zeroes, expected_ones]
-    
-    generated_state = create_ghz_state(N)
-    
-    if sorted(generated_state) == sorted(expected_state):
-        print("verified")
+def verify_ghz_state_vector(actual_state_vector, n):
+    # Build the expected state vector
+    expected_state_vector = [0] * (2**n)
+    expected_state_vector[0] = 1
+    expected_state_vector[-1] = 1
+    # Compare the actual and expected states
+    if actual_state_vector == expected_state_vector:
+        return True, 'verified'
     else:
-        print(f"Expected state: {expected_state} but got {generated_state}")
+        return False, f'actual: {actual_state_vector}, expected: {expected_state_vector}'
 
-# Verification call for N = 3
-verify_ghz_state(3)
+
+# Example usage
+n_qubits = 3
+actual_state_vector = generate_ghz_state_vector(n_qubits)
+verified, message = verify_ghz_state_vector(actual_state_vector, n_qubits)
+print(message)

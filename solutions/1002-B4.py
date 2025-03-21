@@ -10,29 +10,35 @@ Your code should have the following signature:
 Tags: *1700
 '''
 
-def solution(qubits):
-    # Assuming qubits is a list of two binary values representing the state of each qubit
-    # Since it's guaranteed to be one of the four orthogonal states, we just return the index
-    return int(f"{qubits[0]}{qubits[1]}", 2)
+# Function to map a binary measured state to its corresponding index
+def identify_qubit_state_from_measurement(measured_state):
+    # Convert binary string to integer to get index
+    return int(measured_state, 2)
 
-# Verification call
+# Mock verification function
 def verify_solution():
+    # Define possible measured results as test cases
     test_cases = {
-        (0, 0): 0,
-        (0, 1): 1,
-        (1, 0): 2,
-        (1, 1): 3
+        "00": 0,
+        "01": 1,
+        "10": 2,
+        "11": 3
     }
 
-    for input_state, expected_output in test_cases.items():
-        result = solution(input_state)
-        if result == expected_output:
-            print('verified')
+    # Check each test case
+    for measured_state, expected_index in test_cases.items():
+        # Use the function to determine the index
+        result_index = identify_qubit_state_from_measurement(measured_state)
+        
+        # Verification logic
+        if result_index == expected_index:
+            print(f'Test Case "{measured_state}": verified')
         else:
-            print(f"Failed for {input_state}: expected {expected_output}, got {result}")
+            print(f'Error: For "{measured_state}", expected {expected_index} but got {result_index}')
 
-# Execute verification
-def test():
+# Main function to run verification
+def main():
     verify_solution()
 
-test()
+# Invoke the main function
+main()

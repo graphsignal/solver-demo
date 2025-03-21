@@ -10,44 +10,42 @@ Your code should have the following signature:
 Tags: *specialproblem,*1200
 '''
 
-def odd_parity_oracle(num_qubits, input_state):
+# Simulate a simple parity checker to solve the problem sans Qiskit
+
+def compute_parity(bits):
     """
-    Simulates a quantum operation that calculates if the number of 1s is odd among input_state.
-
-    :param num_qubits: Total number of input qubits (excluding the ancilla).
-    :param input_state: List representing the binary state of the qubits (e.g., [1, 1, 0]).
-    :return: Parity result: 1 if odd, 0 if even.
+    Computes the parity of the given binary list.
+    :param bits: A list of binary values (0 or 1)
+    :return: 1 if the number of 1s is odd, 0 otherwise
     """
-    # Initialize ancilla qubit as 0 (|0⟩ state)
-    ancilla = 0
+    return sum(bits) % 2
+
+
+def verify_parity_function():
+    # Define test cases: inputs and the expected parity (0: even, 1: odd)
+    test_cases = [
+        ([0, 0, 0, 0], 0),  # 0 ones, even
+        ([1, 0, 0, 0], 1),  # 1 one, odd
+        ([1, 1, 0, 0], 0),  # 2 ones, even
+        ([1, 1, 1, 0], 1),  # 3 ones, odd
+        ([1, 1, 1, 1], 0),  # 4 ones, even
+    ]
     
-    # For each qubit in the input state, flip ancilla if qubit is 1
-    for qubit in input_state:
-        # Simulate CNOT: Flip ancilla for each qubit with value 1
-        if qubit == 1:
-            ancilla ^= 1  # XOR operation to flip ancilla
-
-    return ancilla
-
-
-# Verification function
-
-def verify_oracle():
-    # Test input: 3 qubits system in state "111", expecting an odd parity (result = 1)
-    test_input = [1, 1, 1]
-    expected_output = 1  # Odd number of 1s
-
-    # Run the oracle
-    result = odd_parity_oracle(3, test_input)
+    # Iterate over the test cases and check if the parity check is correct
+    for bits, expected in test_cases:
+        result = compute_parity(bits)
+        if result == expected:
+            continue  # Correct
+        else:
+            print(f"Incorrect: For input {bits}, expected parity {expected} but got {result}")
+            return
     
-    # Verification check
-    if result == expected_output:
-        print("verified")
-    else:
-        print(f"Verification failed: Expected {expected_output}, but got {result}. Possible issue with oracle implementation.")
+    print("verified")
 
 
-def main():
-    verify_oracle()
+def test():
+    verify_parity_function()
 
-main()
+# Run the test function to verify the parity checker
+
+test()

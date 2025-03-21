@@ -16,40 +16,31 @@ In the first line, output $$$t$$$ — the number of stairways that Tanya climbed
 Tags: implementation,*800
 '''
 
-def tanya_stairways(n, a):
-    steps_per_stairway = []
-    step_count = 0
-    
+def calculate_stairways_steps(n, sequence):
+    steps_list = []
+    current_steps = 0
+
     for i in range(n):
-        if a[i] == 1:
-            if step_count != 0:  # if step_count is not zero, means a stairway ended
-                steps_per_stairway.append(step_count)
-            step_count = 1
-        else:
-            step_count += 1
-    
-    # Add the last stairway count
-    steps_per_stairway.append(step_count)
-    
-    return len(steps_per_stairway), steps_per_stairway
+        current_steps += 1  # counting a step
+        
+        # Check if it's the end of a stairway
+        if i == n - 1 or sequence[i + 1] == 1:
+            steps_list.append(current_steps)
+            current_steps = 0  # reset for next stairway
+
+    return len(steps_list), steps_list
 
 # Test case
-def test_solution():
-    # Given inputs
-    n = 7
-    a = [1, 2, 3, 1, 2, 3, 4]
-    # Expected output
-    expected_t = 2
-    expected_stairways = [3, 4]
-    
-    # Get results
-    result_t, result_stairways = tanya_stairways(n, a)
-    
-    # Verify results
-    if result_t == expected_t and result_stairways == expected_stairways:
-        print('verified')
-    else:
-        print(f'Incorrect result: Got ({result_t}, {result_stairways}), but expected ({expected_t}, {expected_stairways})')
+n = 7
+sequence = [1, 2, 3, 1, 2, 3, 4]
+expected_stairways_count = 2
+expected_steps_list = [3, 4]
 
-# Run test
-test_solution()
+# Call the solution function
+stairways_count, steps_list = calculate_stairways_steps(n, sequence)
+
+# Verification
+if stairways_count == expected_stairways_count and steps_list == expected_steps_list:
+    print('verified')
+else:
+    print(f'incorrect result: expected ({expected_stairways_count}, {expected_steps_list}), got ({stairways_count}, {steps_list})')

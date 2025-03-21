@@ -10,22 +10,26 @@ Write the needed number of flagstones.
 Tags: math,*1000
 '''
 
-def min_flagstones(n, m, a):
+def calculate_flagstones(n, m, a):
     # Calculate the number of flagstones needed along each dimension
-    flagstones_for_length = (n + a - 1) // a  # This is equivalent to math.ceil(n / a)
-    flagstones_for_width = (m + a - 1) // a  # This is equivalent to math.ceil(m / a)
+    num_flagstones_length = (n + a - 1) // a
+    num_flagstones_width = (m + a - 1) // a
     
-    # Total number of flagstones is the product of these numbers
-    total_flagstones = flagstones_for_length * flagstones_for_width
+    # Total number of flagstones is the product of the numbers needed for each dimension
+    total_flagstones = num_flagstones_length * num_flagstones_width
+    
     return total_flagstones
 
-# Test the function with an example
+# Test case where n, m, a are 6, 6, 4 respectively,
+# Expected output is 4 flagstones
 n, m, a = 6, 6, 4
-actual_output = min_flagstones(n, m, a)
-expected_output = 4  # 2 flagstones needed in both directions
+expected_output = 4
 
-# Verification
-if actual_output == expected_output:
+# Call the function with the test case
+result = calculate_flagstones(n, m, a)
+
+# Verify the result
+if result == expected_output:
     print('verified')
 else:
-    print(f'Incorrect result: got {actual_output}, expected {expected_output}')
+    print(f'incorrect result: expected {expected_output}, but got {result}')

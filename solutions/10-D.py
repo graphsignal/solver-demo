@@ -14,63 +14,57 @@ In the first line output k — the length of the longest common increasing subse
 Tags: dp,*2800
 '''
 
-def lcis(sequence1, sequence2):
-    n = len(sequence1)
-    m = len(sequence2)
+def longest_common_increasing_subsequence(n, seq1, m, seq2):
+    dp = [0] * m
+    parent = [-1] * m
 
-    # DP array to store lengths of increasing subsequences
-    dp = [0] * (m + 1)
-    
-    # To store the previous elements to backtrace the sequence
-    prev = [-1] * (m + 1)
-
-    # Auxiliary array to reconstruct the sequence
-    max_length = 0
-    end_pos = -1
+    LCIS_length = 0
+    LCIS_end_pos = -1
 
     for i in range(n):
-        current_length = 0
-        seq_end_index = -1
+        current_max_length = 0
+        last_valid_j = -1
 
         for j in range(m):
-            if sequence1[i] == sequence2[j]:
-                if current_length + 1 > dp[j + 1]:
-                    dp[j + 1] = current_length + 1
-                    prev[j + 1] = seq_end_index
+            if seq1[i] == seq2[j]:
+                if current_max_length + 1 > dp[j]:
+                    dp[j] = current_max_length + 1
+                    parent[j] = last_valid_j
+                if dp[j] > LCIS_length:
+                    LCIS_length = dp[j]
+                    LCIS_end_pos = j
 
-                    if dp[j + 1] > max_length:
-                        max_length = dp[j + 1]
-                        end_pos = j
+            if seq1[i] > seq2[j]:
+                if dp[j] > current_max_length:
+                    current_max_length = dp[j]
+                    last_valid_j = j
 
-            if sequence1[i] > sequence2[j]:
-                if dp[j + 1] > current_length:
-                    current_length = dp[j + 1]
-                    seq_end_index = j
+    LCIS = []
+    pos = LCIS_end_pos
+    while pos != -1:
+        LCIS.append(seq2[pos])
+        pos = parent[pos]
 
-    # Reconstruct the LCIS
-    lcis_sequence = []
-    while end_pos != -1:
-        lcis_sequence.append(sequence2[end_pos])
-        end_pos = prev[end_pos + 1]
+    LCIS.reverse()
+    return LCIS_length, LCIS
 
-    lcis_sequence.reverse()  # To get the sequence in correct order
+# Test the function with a predefined example
+n_test = 5
+seq1_test = [2, 5, 1, 2, 3]
+m_test = 6
+seq2_test = [5, 3, 2, 4, 1, 2]
+expected_length = 2
+expected_sequence = [2, 3]  # Note: This could be different based on valid LCIS
 
-    return max_length, lcis_sequence
+result_length, result_sequence = longest_common_increasing_subsequence(n_test, seq1_test, m_test, seq2_test)
 
-
-def verify_lcis(sequence1, sequence2, expected_length, expected_seq):
-    length, seq = lcis(sequence1, sequence2)
-    if length == expected_length and seq == expected_seq:
-        print("verified")
+# Verify the output
+if result_length == expected_length:
+    # Check if the sequence is indeed a subsequence
+    it = iter(seq2_test)
+    if all(x in it for x in result_sequence) and all(x < y for x, y in zip(result_sequence, result_sequence[1:])):
+        print('verified')
     else:
-        print("incorrect result")
-        print(f"Expected length: {expected_length}, Actual length: {length}")
-        print(f"Expected sequence: {expected_seq}, Actual sequence: {seq}")
-
-# Test case
-sequence1 = [1, 3, 4, 9]
-sequence2 = [1, 2, 4, 6, 9]
-expected_length = 3
-expected_seq = [1, 4, 9]
-
-verify_lcis(sequence1, sequence2, expected_length, expected_seq)
+        print('Error: Resulting sequence is not a valid increasing subsequence.')
+else:
+    print(f'Error: Expected length {expected_length} but got {result_length}')

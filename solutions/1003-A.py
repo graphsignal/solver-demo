@@ -14,29 +14,32 @@ Print only one integer — the minimum number of pockets Polycarp needs to distr
 Tags: implementation,*800
 '''
 
-def min_pockets_for_coins(n, coins):
-    # Initialize frequency array for coin values 1 to 100
+def minimum_pockets(n, coins):
+    # Step 1: Initialize frequency array of size 101
     frequency = [0] * 101
     
-    # Count the frequency of each coin value
+    # Step 2: Count the frequency of each coin value
     for coin in coins:
         frequency[coin] += 1
-
-    # Determine the maximum frequency
+    
+    # Step 3: Find the maximum frequency
     max_frequency = max(frequency)
-
-    # The minimum number of pockets needed is the maximum frequency
+    
+    # Step 4: The minimum number of pockets required
     return max_frequency
 
-# Test the function with an example
-n = 6
-coins = [1, 2, 4, 3, 3, 2]
-expected_result = 2
+# Verification function
 
-# Verify the solution
-actual_result = min_pockets_for_coins(n, coins)
+def verify_minimum_pockets():
+    # Test case
+    coins = [1, 2, 4, 3, 3, 2]
+    n = len(coins)
+    expected_result = 2  # As explained in the example
+    result = minimum_pockets(n, coins)
+    if result == expected_result:
+        print("verified")
+    else:
+        print(f"Incorrect result. Expected {expected_result}, but got {result}.")
 
-if actual_result == expected_result:
-    print('verified')
-else:
-    print(f'Incorrect: expected {expected_result}, but got {actual_result}')
+# Call verify function
+verify_minimum_pockets()

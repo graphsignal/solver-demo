@@ -10,25 +10,31 @@ Write a single YES or NO. Write YES if and only if Sorush can carpet his room co
 Tags: *specialproblem,implementation,*1100
 '''
 
-def can_cover_room(n, k, n1):
-    room_area = n * n
-    carpet_area = n1 * n1
-    total_carpet_area = k * carpet_area
-    return total_carpet_area >= room_area
+def can_carpet_room(n, k, n1):
+    # Calculate areas
+    area_room = n * n
+    area_carpet = n1 * n1
+    area_covered_by_carpets = k * area_carpet
+    
+    # Check conditions
+    if area_covered_by_carpets >= area_room and n % n1 == 0:
+        return "YES"
+    else:
+        return "NO"
 
-# Test example:
-# Let's say the room's side n = 10, and we have k = 5 carpets each of side n1 = 5.
-# Expected output: NO, because 5*5*5 = 125 which is less than 10*10 = 100.
+# Define the verification function
+def verify():
+    # Test case
+    n = 10
+    k = 9
+    n1 = 3
+    expected = "NO"
+    result = can_carpet_room(n, k, n1)
+    
+    # Verify the result
+    if result == expected:
+        print("verified")
+    else:
+        print(f"Test failed: expected {expected}, got {result}")
 
-n = 10
-k = 5
-n1 = 5
-expected_output = "NO" if not can_cover_room(n, k, n1) else "YES"
-
-# Actual function output:
-actual_output = "YES" if can_cover_room(n, k, n1) else "NO"
-
-if actual_output == expected_output:
-    print("verified")
-else:
-    print(f"Incorrect result. Expected: {expected_output}, Got: {actual_output}")
+verify()

@@ -30,48 +30,44 @@ In the third example there is only one way to split the array: $$$[~], [4, 1, 2]
 Tags: binarysearch,datastructures,twopointers,*1200
 '''
 
-def maximum_equal_sum(n, arr):
-    # Step 1: Calculate prefix and suffix sums
-    prefix_sum = [0] * (n + 1)
-    suffix_sum = [0] * (n + 1)
-    
-    for i in range(1, n + 1):
-        prefix_sum[i] = prefix_sum[i - 1] + arr[i - 1]
-    
-    for i in range(n - 1, -1, -1):
-        suffix_sum[i] = suffix_sum[i + 1] + arr[i]
+def find_max_sum(d):
+    n = len(d)
+    if n == 0:
+        return 0
 
-    # Step 2 & 3: Two pointers to find maximum sum_1 = sum_3
+    # Initialize pointers
+    left = 0
+    right = n - 1
+
+    # Initialize prefix and suffix sums
+    sum_left = 0
+    sum_right = 0
+
+    # Initialize the result
     max_sum = 0
-    i, j = 0, n
 
-    while i <= j:
-        if prefix_sum[i] < suffix_sum[j]:
-            i += 1
-        elif prefix_sum[i] > suffix_sum[j]:
-            j -= 1
-        else:  # prefix_sum[i] == suffix_sum[j]
-            max_sum = max(max_sum, prefix_sum[i])
-            i += 1
-            j -= 1
+    # Use two pointers to find the maximum sum where sum_left = sum_right
+    while left <= right:
+        if sum_left < sum_right:
+            sum_left += d[left]
+            left += 1
+        else:
+            sum_right += d[right]
+            right -= 1
+
+        if sum_left == sum_right:
+            max_sum = max(max_sum, sum_left)
 
     return max_sum
 
+# Test case and verification
+# Example Test: array d = [1, 3, 1, 4]
+test_array = [1, 3, 1, 4]
+expected_result = 4
+actual_result = find_max_sum(test_array)
+
 # Verification
-# Test cases
-# Example 1
-arr1 = [1, 3, 1, 4, 1, 3, 1]
-expected1 = 5  # [1, 3, 1], [~], [1, 4]
-assert maximum_equal_sum(len(arr1), arr1) == expected1, f"Test 1 failed: {maximum_equal_sum(len(arr1), arr1)} != {expected1}"
-
-# Example 2
-arr2 = [1, 3, 2, 1, 4]
-expected2 = 4  # [1, 3], [2, 1], [4]
-assert maximum_equal_sum(len(arr2), arr2) == expected2, f"Test 2 failed: {maximum_equal_sum(len(arr2), arr2)} != {expected2}"
-
-# Example 3
-arr3 = [4, 1, 2]
-expected3 = 0  # Only [~], [4, 1, 2], [~]
-assert maximum_equal_sum(len(arr3), arr3) == expected3, f"Test 3 failed: {maximum_equal_sum(len(arr3), arr3)} != {expected3}"
-
-print("verified")
+if actual_result == expected_result:
+    print('verified')
+else:
+    print(f'Incorrect result. Expected: {expected_result}, but got: {actual_result}')

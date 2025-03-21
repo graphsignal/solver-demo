@@ -12,31 +12,30 @@ Your code should have the following signature:
 Tags: *1600
 '''
 
-def majority_function(a, b, c):
-    """Simulates the majority function of three bits."""
-    return 1 if a + b + c >= 2 else 0
+def majority_oracle_classical(a, b, c):
+    # Returns 1 if two or more of the three bits are 1
+    return (a & b) | (a & c) | (b & c)
 
 
-def test_majority_function():
-    # Define all possible input states and their expected results
-    test_cases = {
-        (0, 0, 0): 0,
-        (0, 0, 1): 0,
-        (0, 1, 0): 0,
-        (0, 1, 1): 1,
-        (1, 0, 0): 0,
-        (1, 0, 1): 1,
-        (1, 1, 0): 1,
-        (1, 1, 1): 1
-    }
+def verify_majority_oracle():
+    # Test various input combinations
+    test_cases = [
+        (0, 0, 0, 0), 
+        (0, 0, 1, 0), 
+        (0, 1, 0, 0), 
+        (0, 1, 1, 1), 
+        (1, 0, 0, 0), 
+        (1, 0, 1, 1), 
+        (1, 1, 0, 1), 
+        (1, 1, 1, 1)
+    ]
     
-    # Verify each test case
-    for (a, b, c), expected in test_cases.items():
-        result = majority_function(a, b, c)
+    for a, b, c, expected in test_cases:
+        result = majority_oracle_classical(a, b, c)
         if result == expected:
-            print(f"Test with inputs ({a}, {b}, {c}) passed: Output: {result}, Expected: {expected} - verified")
+            print(f'Input ({a}, {b}, {c}): verified')
         else:
-            print(f"Test with inputs ({a}, {b}, {c}) failed: Output: {result}, Expected: {expected} - Reason: Incorrect result")
+            print(f'Input ({a}, {b}, {c}): Error, expected {expected} got {result}')
 
-# Run the test function
-test_majority_function()
+# Run verification
+verify_majority_oracle()

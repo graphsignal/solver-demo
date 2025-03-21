@@ -14,51 +14,38 @@ If the group is friendly write "FRIENDS", else write "NOT FRIENDS".
 Tags: *specialproblem,implementation,*1500
 '''
 
-def are_friends(integers):
-    """
-    Determine if the group of integers is friendly.
-
-    Parameters:
-    integers (list): A list of sorted non-zero integers.
-
-    Returns:
-    str: "FRIENDS" if the group is friendly, otherwise "NOT FRIENDS".
-    """
-    n = len(integers)
-
-    if n == 1:
-        # A single integer group is always friendly.
-        return "FRIENDS"
-
-    # Check divisibility condition
-    for i in range(n - 1):
-        if integers[i + 1] % integers[i] != 0:
-            return "NOT FRIENDS"
-
+def are_friends(numbers):
+    n = len(numbers)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if numbers[j] % numbers[i] != 0:
+                return "NOT FRIENDS"
     return "FRIENDS"
 
-def test_solution():
-    # Test case: Expected result is "FRIENDS"
-    test1 = [3, 6, 12]
-    expected1 = "FRIENDS"
-    result1 = are_friends(test1)
-    
-    # Test case: Expected result is "NOT FRIENDS"
-    test2 = [5, 20, 45]
-    expected2 = "NOT FRIENDS"
-    result2 = are_friends(test2)
-    
-    # Verification
-    if result1 == expected1:
-        print("Test 1 verified")
-    else:
-        print(f"Test 1 failed: got {result1}, expected {expected1}")
+# Verification function
 
+def verify_solution():
+    test_cases = [
+        # Already sorted friendly group
+        ([2, 4, 8, 16], "FRIENDS"),
+        # Unfriendly group, 120 and 36 are not friends
+        ([12, 24, 36, 120], "NOT FRIENDS"),
+        # Single element is trivially friendly
+        ([7], "FRIENDS"),
+        # Friendly group, one divides the next one
+        ([1, 2, 4, 8, 16, 32], "FRIENDS"),
+        # Mixed numbers not entirely friendly
+        ([3, 5, 15], "NOT FRIENDS"),
+        # Edge case: larger numbers, not friendly
+        ([1000000, 2000000, 3000000], "NOT FRIENDS"),
+    ]
     
-    if result2 == expected2:
-        print("Test 2 verified")
-    else:
-        print(f"Test 2 failed: got {result2}, expected {expected2}")
+    for i, (nums, expected) in enumerate(test_cases):
+        result = are_friends(nums)
+        if result == expected:
+            print(f"Test case {i+1}: verified")
+        else:
+            print(f"Test case {i+1}: failed - expected {expected}, got {result}")
 
-# Run the test function
-test_solution()
+# Run verification
+verify_solution()

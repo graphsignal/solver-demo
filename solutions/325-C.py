@@ -18,99 +18,105 @@ If any number in output exceeds 314000000 (but is finite), print 314000000 inste
 Tags: dfsandsimilar,graphs,shortestpaths,*2600
 '''
 
-def solve_monster_diamonds(m, n, split_rules):
+def solve_monster_problem(m, n, split_rules):
     from collections import defaultdict, deque
     import sys
+
     sys.setrecursionlimit(200000)
 
     # Constants
-    CAP = 314000000
-    UNREACHABLE = -1
-    UNBOUNDED = -2
+    INF = float('inf')
+    LIMIT = 314000000
 
-    # Graph setup
-    graph = defaultdict(list)
-    reverse_graph = defaultdict(list)
-    indegree = [0] * (n + 1)
+    # Initialize Graph
+    adj_list = defaultdict(list)
 
+    # Parse split rules
     for rule in split_rules:
-        monster_id, *res = rule
-        num_diamonds = res.count(-1)
-        result_monsters = [x for x in res if x != -1]
-        graph[monster_id].append((num_diamonds, result_monsters))
-        for rm in result_monsters:
-            reverse_graph[rm].append(monster_id)
-            indegree[rm] += 1
+        mi = rule[0]
+        li = rule[1]
+        adj_list[mi].append(rule[2:])  # Add the generated monsters and diamonds rule
 
-    # Step 1: Topological sorting with a queue
-    order = []
-    queue = deque()
-    for monster in range(1, n + 1):
-        if indegree[monster] == 0:
-            queue.append(monster)
+    # Arrays to store minimum and maximum diamonds
+    min_diamonds = [INF] * (n + 1)
+    max_diamonds = [-1] * (n + 1)
 
-    while queue:
-        node = queue.popleft()
-        order.append(node)
-        for num_diamonds, result_monsters in graph[node]:
-            for rm in result_monsters:
-                indegree[rm] -= 1
-                if indegree[rm] == 0:
-                    queue.append(rm)
+    # Helper function for DFS with memoization
+    def dfs(monster_id, min_diam, max_diam, visited):
+        if min_diam[monster_id] != INF and max_diam[monster_id] != -1:
+            # Already calculated
+            return min_diam[monster_id], max_diam[monster_id]
+        if visited[monster_id]:
+            # We're in a cycle, check for possible infinite case
+            return INF, -2
 
-    # Step 2: Handle cycles (check for unprocessed nodes in order)
-    if len(order) < n:
-        special_cases = [(UNREACHABLE, UNBOUNDED) if monster + 1 not in order else None for monster in range(n)]
-    else:
-        special_cases = [None] * n
-
-    # Step 3: Process in reverse topological order
-    minDiamonds = [float('inf')] * (n + 1)
-    maxDiamonds = [0] * (n + 1)
-
-    for monster in reversed(order):
-        for num_diamonds, successors in graph[monster]:
-            total_min = num_diamonds
-            total_max = num_diamonds
-            for succ in successors:
-                if minDiamonds[succ] == float('inf'):
-                    total_min = float('inf')
-                    break
-                total_min += minDiamonds[succ]
-                total_max += maxDiamonds[succ]
+        visited[monster_id] = True
+        local_min = INF
+        local_max = 0
+        for rule in adj_list[monster_id]:
+            diamonds = rule.count(-1)
+            next_monsters = [m for m in rule if m != -1]
+            # Sum diamonds and recursive call on next monsters
+            cur_min = diamonds
+            cur_max = diamonds
+            for nm in next_monsters:
+                min_result, max_result = dfs(nm, min_diam, max_diam, visited)
+                if max_result == -2:
+                    cur_max = -2
+                elif max_result != -1:
+                    cur_max += max_result
+                if min_result == INF:
+                    cur_min = INF
+                else:
+                    cur_min += min_result
+            local_min = min(local_min, cur_min)
+            if cur_max != -2:
+                local_max = max(local_max, cur_max)
             else:
-                minDiamonds[monster] = min(minDiamonds[monster], total_min)
-                maxDiamonds[monster] = max(maxDiamonds[monster], min(total_max, CAP))
-
-    results = []
-    for i in range(1, n + 1):
-        if special_cases[i - 1]:
-            results.append(special_cases[i - 1])
+                local_max = -2
+        if local_min == INF:
+            min_diam[monster_id] = -1
         else:
-            if minDiamonds[i] == float('inf'):
-                results.append((UNREACHABLE, UNREACHABLE))
-            else:
-                results.append((minDiamonds[i], CAP if maxDiamonds[i] >= CAP else maxDiamonds[i]))
+            min_diam[monster_id] = local_min
+        max_diam[monster_id] = local_max
+        visited[monster_id] = False
+        return min_diam[monster_id], max_diam[monster_id]
 
-    return results
+    # Calculate for each monster type
+    for monster_id in range(1, n + 1):
+        if min_diamonds[monster_id] == INF:
+            visited = [False] * (n + 1)
+            min_d, max_d = dfs(monster_id, min_diamonds, max_diamonds, visited)
+            if min_d > LIMIT:
+                min_d = LIMIT
+            if max_d > LIMIT:
+                max_d = LIMIT
+            min_diamonds[monster_id] = min_d
+            max_diamonds[monster_id] = max_d
 
-# Sample Test Case to verify
-m = 2
-n = 2
+    # Prepare output
+    result = []
+    for i in range(1, n + 1):
+        if min_diamonds[i] > LIMIT:
+            min_diamonds[i] = LIMIT
+        if max_diamonds[i] > LIMIT:
+            max_diamonds[i] = LIMIT
+        result.append((min_diamonds[i], max_diamonds[i]))
+
+    return result
+
+# Test case (m = 1, n = 1)
+# One monster with a single split rule: one diamond
+m = 1
+n = 1
 split_rules = [
-    [1, 2, -1],  # Monster 1 can split into 1 Monster 2 and 1 diamond
-    [2, -1]      # Monster 2 can split into 1 diamond
+    [1, 1, -1]  # Monster 1 splits into 1 diamond
 ]
+actual_output = solve_monster_problem(m, n, split_rules)
+expected_output = [(1, 1)]
 
-# Expected Output:
-# Monster 1: (2, 2) because it can split 1 -> 2 (+1 diamond), then 2 -> (+1 diamond)
-# Monster 2: (1, 1) because it directly goes to 1 diamond
-expected = [(2, 2), (1, 1)]
-
-actual = solve_monster_diamonds(m, n, split_rules)
-
-# Verification
-if actual == expected:
+# Verify output
+if actual_output == expected_output:
     print('verified')
 else:
-    print(f'Failed: expected {expected}, but got {actual}')
+    print(f'mismatch: got {actual_output}, expected {expected_output})')

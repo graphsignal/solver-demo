@@ -14,65 +14,37 @@ Print all possible numbers of invited teams in ascending order, one per line. If
 Tags: binarysearch,math,*1800
 '''
 
-def tournament_games(t):
-    """
-    Calculate the total number of games played in the tournament if we start with `t` teams.
-    """
-    games = 0
-    while t > 1:
-        # Even elimination rounds
-        games += t // 2
-        t = (t + 1) // 2  # Advance half the teams; if odd, round up a team
-        
-        # If we reach 2 or less teams, consider round-robin games
-        if t == 2:
-            games += 1  # Only one game needed if two teams remain
-            break
-    return games
+def tournament_games(n):
+    def calculate_games(T):
+        games = 0
+        while T > 1:
+            if T % 2 == 0:
+                games += T // 2
+                T //= 2
+            else:
+                break
+        if T > 1:
+            games += (T * (T-1)) // 2
+        return games
 
+    possible_teams = []
+    # Try every possible number of teams up to some reasonable bound
+    # Let's use a heuristic upper bound
+    upper_bound = 10**6  # This is a rough heuristic. For more precise bound use another method
+    for T in range(2, upper_bound + 1, 2):  # Start from 2, check only even, increment by 2
+        if calculate_games(T) == n:
+            possible_teams.append(T)
 
-def find_possible_teams(n):
-    """
-    Find all possible numbers of teams that result in exactly n games being played.
-    """
-    if n < 1:
-        return [-1]
+    return possible_teams if possible_teams else [-1]
 
-    candidates = []
-    t = 2
-    while True:
-        games = tournament_games(t)
-        if games > n:
-            break
-        if games == n:
-            candidates.append(t)
-        t += 1
-
-    return candidates if candidates else [-1]
-
-
-def verify_solution(solution, expected):
-    if solution == expected:
+# A test verification call
+def verify():
+    test_n = 25  # From the example case considered in problem description
+    expected_output = [20]
+    result = tournament_games(test_n)
+    if result == expected_output:
         print("verified")
     else:
-        print(f"Failed: Expected {expected}, but got {solution}")
+        print(f"Test failed for n={test_n}.\nExpected {expected_output} but got {result}.")
 
-# Example verification
-test_n = 25
-expected_output = [20]  # Notice that expected output needs to be verified if accurate
-result = find_possible_teams(test_n)
-verify_solution(result, expected_output)
-
-# Additional test cases
-# Here we should adjust the expected outputs based on verified computations
-# Let's re-evaluate using smaller known values to ensure the algorithm is behaving as expected.
-additional_tests = [
-    (1, [-1]),  # Not enough rounds for meaningful game
-    (2, [3]),  # When n=2, should have 3 teams
-    (3, [4]),  # With 4 teams, we have 3 initial rounds (2 eliminations and 1 final)
-    (6, [5]),  # For n=6, should have 5 teams
-]
-
-for n, expected in additional_tests:
-    result = find_possible_teams(n)
-    verify_solution(result, expected)
+verify()

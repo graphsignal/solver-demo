@@ -20,37 +20,41 @@ Your answer will be considered correct if the following condition holds: $$$|res
 Tags: bruteforce,implementation,math,*1300
 '''
 
-def calculate_heat_intensity(n, k, temperatures):
-    # Compute prefix sum array
-    prefix = [0] * (n + 1)
+def find_maximum_average_temperature(n, k, temperatures):
+    # Step 1: Compute prefix sums
+    prefix_sum = [0] * (n + 1)
     for i in range(n):
-        prefix[i + 1] = prefix[i] + temperatures[i]
+        prefix_sum[i + 1] = prefix_sum[i] + temperatures[i]
 
-    # Initialize maximum average
-    max_avg = 0.0
+    # Step 2: Track maximum average
+    max_average = float('-inf')
 
-    # Iterate over all starting positions
-    for start in range(n):
-        for length in range(k, n - start + 1):
-            sum_segment = prefix[start + length] - prefix[start]
-            avg = sum_segment / length
-            if avg > max_avg:
-                max_avg = avg
+    # Step 3: Evaluate all segments of at least k days
+    for i in range(n):
+        for j in range(i + k - 1, n):
+            segment_sum = prefix_sum[j + 1] - prefix_sum[i]
+            segment_length = j - i + 1
+            average = segment_sum / segment_length
+            if average > max_average:
+                max_average = average
 
-    return max_avg
+    return max_average
 
-# Fix expected result based on correct understanding
-n_test = 4
-k_test = 3
-temperatures_test = [3, 4, 1, 2]
-expected_output = 2.6666666666666665 # The correct segment average as per previous explanation.
+# Test the function with a sample input
+# Test case: n = 4, k = 3, temperatures = [3, 4, 1, 2]
+# Expected result can be calculated by hand:
+# Max averages will be (3+4+1)/3 = 8/3 = 2.6667, (4+1+2)/3 = 7/3 = 2.3333, and (3+4+1+2)/4 = 10/4 = 2.5.
+# Thus, the maximum average of segments of at least 3 days is 2.6667.
 
-# Run the function
-actual_output = calculate_heat_intensity(n_test, k_test, temperatures_test)
+def verify_result():
+    n = 4
+    k = 3
+    temperatures = [3, 4, 1, 2]
+    expected = 2.6666666666666665  # Approximately 2.6667
+    result = find_maximum_average_temperature(n, k, temperatures)
+    if abs(result - expected) < 1e-6:
+        print('verified')
+    else:
+        print(f'incorrect: actual result = {result}, expected = {expected}')
 
-# Verify the output
-if abs(actual_output - expected_output) < 1e-6:
-    print('verified')
-else:
-    print('incorrect result')
-    print(f'Actual: {actual_output}, Expected: {expected_output})')
+verify_result()

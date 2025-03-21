@@ -12,50 +12,57 @@ In a single line print "YES", if the given rectangles form a square, or "NO" oth
 Tags: implementation,*1500
 '''
 
-def check_if_rectangles_form_square(rectangles):
-    if not rectangles:
-        return "NO"
-    
-    min_x = float('inf')
-    min_y = float('inf')
-    max_x = float('-inf')
-    max_y = float('-inf')
+def does_form_square(n, rectangles):
+    # Step 1: Calculate the total area of all rectangles
     total_area = 0
-
-    for x1, y1, x2, y2 in rectangles:
-        min_x = min(min_x, x1)
-        min_y = min(min_y, y1)
-        max_x = max(max_x, x2)
-        max_y = max(max_y, y2)
+    for (x1, y1, x2, y2) in rectangles:
         total_area += (x2 - x1) * (y2 - y1)
 
-    # Calculate the side length of the bounding square
-    side_length = max_x - min_x
+    # Step 2: Determine the bounding box
+    x_min = min(rect[0] for rect in rectangles)
+    y_min = min(rect[1] for rect in rectangles)
+    x_max = max(rect[2] for rect in rectangles)
+    y_max = max(rect[3] for rect in rectangles)
 
-    # Check if bounding box is a square
-    if side_length == (max_y - min_y):
-        # Calculate the area of the bounding box assumed square
-        if total_area == side_length * side_length:
-            return "YES"
+    # Step 3: Check for square property
+    width = x_max - x_min
+    height = y_max - y_min
 
-    return "NO"
+    # Step 4: Verify area match
+    square_area = width * height
+
+    if width == height and total_area == square_area:
+        return "YES"
+    else:
+        return "NO"
 
 # Verification function
 
-def verify_solution(test_case, expected):
-    result = check_if_rectangles_form_square(test_case)
-    if result == expected:
+def verify():
+    # Test case where rectangles form a square
+    rectangles = [
+        (0, 0, 2, 2), 
+        (2, 0, 4, 2), 
+        (0, 2, 2, 4), 
+        (2, 2, 4, 4),
+    ]
+    expected_result = "YES"
+    actual_result = does_form_square(4, rectangles)
+    if actual_result == expected_result:
         print("verified")
     else:
-        print(f"Incorrect: Expected {expected}, but got {result}")
+        print(f"Test failed: expected {expected_result}, but got {actual_result}")
 
-# Test case
-rectangles_test = [
-    (0, 0, 2, 2), 
-    (0, 2, 2, 4), 
-    (2, 0, 4, 2), 
-    (2, 2, 4, 4)
-]
+    # Test case where rectangles do not form a square
+    rectangles = [
+        (0, 0, 2, 2),
+        (2, 0, 3, 2),
+    ]
+    expected_result = "NO"
+    actual_result = does_form_square(2, rectangles)
+    if actual_result == expected_result:
+        print("verified")
+    else:
+        print(f"Test failed: expected {expected_result}, but got {actual_result}")
 
-# This should form a perfect 4x4 square
-verify_solution(rectangles_test, "YES")
+verify()

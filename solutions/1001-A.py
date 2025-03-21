@@ -10,33 +10,35 @@ Your code should have the following signature:
 Tags: *specialproblem,*1100
 '''
 
-def solution(sign):
+class Qubit:
+    def __init__(self, state='|0⟩'):
+        self.state = state
+
+    def __str__(self):
+        return self.state
+
+
+def transform_qubit(qubit, sign):
     if sign == 1:
-        return [0.707, 0.707]  # Represents |+⟩
+        qubit.state = '|0⟩'  # Set state to |0⟩
     elif sign == -1:
-        return [0.707, -0.707]  # Represents |-⟩
+        qubit.state = '|1⟩'  # Set state to |1⟩
     else:
-        raise ValueError("Sign must be either 1 or -1.")
+        print("Unexpected sign value. Expected 1 or -1.")
 
-
-def verify_solution():
-    # Test case for sign = 1
-    sign = 1
-    expected_state_plus = [0.707, 0.707]  # |+⟩ expected state
-    result_state = solution(sign)
-    if all([abs(a - b) < 0.001 for a, b in zip(expected_state_plus, result_state)]):
-        print("Verified: The qubit is in the |+⟩ state as expected.")
+# Verification function
+def verify_transformation(initial_state, sign, expected_state):
+    qubit = Qubit(initial_state)
+    transform_qubit(qubit, sign)
+    actual_state = str(qubit)
+    if actual_state == expected_state:
+        print('verified')
     else:
-        print(f"Incorrect: Expected {expected_state_plus} but got {result_state}")
+        print(f'Incorrect transformation. Actual: {actual_state}, Expected: {expected_state}')
 
-    # Test case for sign = -1
-    sign = -1
-    expected_state_minus = [0.707, -0.707]  # |-⟩ expected state
-    result_state = solution(sign)
-    if all([abs(a - b) < 0.001 for a, b in zip(expected_state_minus, result_state)]):
-        print("Verified: The qubit is in the |-⟩ state as expected.")
-    else:
-        print(f"Incorrect: Expected {expected_state_minus} but got {result_state}")
-
-
-verify_solution()
+# Test the function
+verify_transformation('|0⟩', 1, '|0⟩')  # Should print 'verified'
+verify_transformation('|1⟩', -1, '|1⟩')  # Should print 'verified'
+verify_transformation('|0⟩', -1, '|1⟩')  # Should print 'verified'
+verify_transformation('|1⟩', 1, '|0⟩')  # Should print 'verified'
+verify_transformation('|0⟩', 0, '|0⟩')  # Should print "Unexpected sign value..." and "Incorrect transformation..."

@@ -28,46 +28,46 @@ In the second example no preprocess moves are required. We can use the following
 Tags: implementation,*1700
 '''
 
-def min_preprocess_moves(n, a, b):
-    preprocess_moves = 0
+from collections import Counter
 
+def minimum_preprocess_moves(n, a, b):
+    preprocess_moves = 0
+    
     for i in range(n // 2):
         j = n - i - 1
+        chars = [a[i], a[j], b[i], b[j]]
+        count = Counter(chars)
         
-        # Get the tuple of characters
-        chars = {a[i], a[j], b[i], b[j]}
-        
-        if len(chars) == 4:
-            # Four different characters need at least 2 changes
-            preprocess_moves += 2
-        elif len(chars) == 3:
-            # Three different characters need at least 1 change
+        if len(count) == 1:
+            continue
+        elif len(count) == 2:
+            values = sorted(count.values())
+            if values == [2, 2]:
+                continue
             preprocess_moves += 1
-        elif len(chars) == 2:
-            # Two different characters, check the symmetric condition
-            if (a[i] != a[j] or b[i] != b[j]) and (a[i] != b[j] or b[i] != a[j]):
-                preprocess_moves += 1
+        elif len(count) == 3:
+            # One of the characters appears twice, others once
+            preprocess_moves += 1
+        else:
+            # All four characters are different, need two changes
+            preprocess_moves += 2
 
-    # If n is odd, handle the middle character
     if n % 2 == 1:
-        middle = n // 2
-        if a[middle] != b[middle]:
+        mid_index = n // 2
+        if a[mid_index] != b[mid_index]:
             preprocess_moves += 1
 
     return preprocess_moves
 
-# Test the implementation
-result = min_preprocess_moves(7, "abcbaba", "bacabba")
-expected_result = 4
-if result == expected_result:
-    print("verified")
-else:
-    print(f"Incorrect result: got {result}, expected {expected_result}")
-    
-# Adding the second test case
-result2 = min_preprocess_moves(5, "abcde", "edcba")
-expected_result2 = 0
-if result2 == expected_result2:
-    print("verified")
-else:
-    print(f"Incorrect result: got {result2}, expected {expected_result2}")
+# Test Cases
+n1, a1, b1 = 7, "abacaba", "bacabba"
+expected1 = 4
+result1 = minimum_preprocess_moves(n1, a1, b1)
+assert result1 == expected1, f"Test case 1 failed: expected {expected1}, got {result1}"
+
+n2, a2, b2 = 6, "ababab", "bababa"
+expected2 = 0
+result2 = minimum_preprocess_moves(n2, a2, b2)
+assert result2 == expected2, f"Test case 2 failed: expected {expected2}, got {result2}"
+
+print("verified")

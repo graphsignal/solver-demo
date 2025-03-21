@@ -10,71 +10,55 @@ Print the given polynom in a standard way. Note, that the answer in this problem
 Tags: *specialproblem,implementation,*1800
 '''
 
-def multiply_polynomials(p1, p2):
-    """Multiplies two polynomials p1 and p2 given as lists of coefficients"""
-    # Initialize the result list with zeros
-    result = [0] * (len(p1) + len(p2) - 1)
-    # Multiply each term of the first polynomial with each term of the second
-    for i, coeff1 in enumerate(p1):
-        for j, coeff2 in enumerate(p2):
-            result[i + j] += coeff1 * coeff2
-    return result
+def expand_polynomial(n, a_list):
+    # Start with a polynomial representing '1'
+    coefficients = [1]
 
+    # Multiply by each factor (x + ai)
+    for a in a_list:
+        # Multiply the current polynomial by (x + a)
+        new_coeffs = [0] * (len(coefficients) + 1)
+        for i in range(len(coefficients)):
+            new_coeffs[i] += coefficients[i]  # 
+            new_coeffs[i+1] += coefficients[i] * a
+        coefficients = new_coeffs
 
-def expand_polynomial(n, coefficients):
-    # Start with the polynomial (1) which is [1] => 1
-    current_poly = [1]
-    # Iterate over each ai and form (x + ai)
-    for ai in coefficients:
-        # Current factor (x + ai) is represented as [1, ai]
-        factor = [1, ai]
-        # Update the current polynomial by multiplying it with the newest factor
-        current_poly = multiply_polynomials(current_poly, factor)
-    return current_poly
-
-
-def format_polynomial(coeffs):
+    # Prepare the polynomial string
     terms = []
-    degree = len(coeffs) - 1
-    for i, coeff in enumerate(coeffs):
-        if coeff == 0:
-            continue  # Skip zero coefficients
+    degree = len(coefficients) - 1
+    for i, coef in enumerate(coefficients):
         power = degree - i
+        if coef == 0:
+            continue
         if power == 0:
-            # Constant term
-            terms.append(f"{coeff}")
+            terms.append(f'{coef}')
         elif power == 1:
-            # Linear term
-            if abs(coeff) == 1:
-                sign = "-" if coeff < 0 else ""
-                terms.append(f"{sign}X")
+            if coef == 1:
+                terms.append('X')
+            elif coef == -1:
+                terms.append('-X')
             else:
-                terms.append(f"{coeff}*X")
+                terms.append(f'{coef}*X')
         else:
-            # Higher power terms
-            if abs(coeff) == 1:
-                sign = "-" if coeff < 0 else ""
-                terms.append(f"{sign}X^{power}")
+            if coef == 1:
+                terms.append(f'X^{power}')
+            elif coef == -1:
+                terms.append(f'-X^{power}')
             else:
-                terms.append(f"{coeff}*X^{power}")
-    # Join terms with a plus sign and replace '+-' with '-'
+                terms.append(f'{coef}*X^{power}')
+
     return '+'.join(terms).replace('+-', '-')
 
+# Test the solution with a known case
+test_case = (3, [-1, 0, 1])  # Corresponds to (x - 1)(x)(x + 1) => x^3 - x
+expected_output = 'X^3-X'
+result = expand_polynomial(*test_case)
 
-def solution():
-    # Example test case with n = 2, a1 = -1, a2 = -1
-    # This corresponds to the polynomial: (x - 1)(x - 1) = x^2 - 2x + 1
-    n = 2
-    coefficients = [-1, -1]
-    expected = "X^2-2*X+1"
-    # Expand the polynomial
-    expanded_coeffs = expand_polynomial(n, coefficients)
-    # Format the expanded polynomial
-    result = format_polynomial(expanded_coeffs)
-    # Verification
+# Verification
+def verify_result(result, expected):
     if result == expected:
         print('verified')
     else:
-        print(f'Incorrect result. Expected: {expected}, got: {result}')
+        print(f'Incorrect. Expected {expected}, but got {result}.')
 
-solution()
+verify_result(result, expected_output)

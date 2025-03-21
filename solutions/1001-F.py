@@ -12,26 +12,27 @@ Your code should have the following signature:
 Tags: *specialproblem,*1300
 '''
 
-def identify_basis_state(state, bits0, bits1):
-    # Compare with bits0
-    if state == bits0:
+def determine_basis_state(input_state, bits0, bits1):
+    # Compare input_state with bits0
+    if input_state == bits0:
         return 0
-    # Compare with bits1
-    elif state == bits1:
+    # Compare input_state with bits1
+    elif input_state == bits1:
         return 1
-    # Should not reach here due to problem guarantees
-    raise ValueError("State does not match any provided basis state.")
+    # We should not reach here if the problem guarantees a match, but it's safe to have a fallback.
+    else:
+        raise ValueError("The input state does not match the provided basis states")
 
-# Test the solution function with a test case
-test_state = [True, False, True]  # Example test state
+# Test case verification
+input_state = [True, False, True]
 bits0 = [True, False, True]
-bits1 = [False, True, True]
+bits1 = [False, True, False]
 
-# The expected result is 0 because test_state matches bits0
+# Expected output is 0 as input_state matches bits0
 expected_result = 0
-result = identify_basis_state(test_state, bits0, bits1)
+actual_result = determine_basis_state(input_state, bits0, bits1)
 
-if result == expected_result:
+if actual_result == expected_result:
     print("verified")
 else:
-    print(f"Test failed: Expected {expected_result}, got {result}")
+    print(f"Incorrect result. Expected {expected_result}, but got {actual_result}.")

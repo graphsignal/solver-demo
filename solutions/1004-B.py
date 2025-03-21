@@ -26,38 +26,38 @@ The total beauty is equal to $$$1+4+2=7$$$.
 Tags: constructivealgorithms,greedy,implementation,math,*1300
 '''
 
-def maximize_flower_beauty(n, m, visitors):
-    # Optionally use "010101..." pattern, but "101010..." is also valid
-    pattern = ['0', '1'] * (n // 2 + 1)
-    flower_row = ''.join(pattern[:n])
-    return flower_row
+def maximize_beauty(n, m, segments):
+    # We will create an alternating pattern of flowers (0 - rose, 1 - lily)
+    result = []
+    for i in range(n):
+        if i % 2 == 0:
+            result.append('0')
+        else:
+            result.append('1')
+    return ''.join(result)
 
-# Helper function to validate the pattern conform to the visitor's segment requirement
-def validate_alternating_patterns(n, visitors):
-    # Check for a valid pattern "010101..."
-    valid_pattern_1 = ['0', '1'] * (n // 2 + 1)
-    valid_str_1 = ''.join(valid_pattern_1[:n])
+# Verification based on expected outcomes.
+def verify_solution():
+    # Example case 1: 
+    n1, m1 = 5, 3
+    segments1 = [(1, 2), (2, 3), (1, 5)]  # segments aren't used in the solution calculation
+    result1 = maximize_beauty(n1, m1, segments1)
+    expected1_possibilities = {"01010", "10101"}  # Either alternating sequence is valid
     
-    # Check for alternate valid pattern "101010..."
-    valid_pattern_2 = ['1', '0'] * (n // 2 + 1)
-    valid_str_2 = ''.join(valid_pattern_2[:n])
+    # Example case 2: 
+    n2, m2 = 6, 3
+    segments2 = [(1, 1), (2, 5), (3, 6)]
+    result2 = maximize_beauty(n2, m2, segments2)
+    expected2_possibilities = {"010101", "101010"}  # Either alternating sequence is valid
     
-    # Verify for all visitor segments
-    for li, ri in visitors:
-        segment_1 = valid_str_1[li-1:ri]
-        segment_2 = valid_str_2[li-1:ri]
-        if not ('0' in segment_1 and '1' in segment_1) and not ('0' in segment_2 and '1' in segment_2):
-            return False
-    return True
+    if result1 in expected1_possibilities:
+        print("Case 1 verified")
+    else:
+        print(f"Case 1 incorrect. Got {result1}, expected one of {expected1_possibilities}")
+        
+    if result2 in expected2_possibilities:
+        print("Case 2 verified")
+    else:
+        print(f"Case 2 incorrect. Got {result2}, expected one of {expected2_possibilities}")
 
-# Sample test
-n, m = 5, 3
-visitors = [(1, 2), (2, 3), (1, 5)]
-
-actual_output = maximize_flower_beauty(n, m, visitors)
-
-# Check if the actual output meets the requirements
-if validate_alternating_patterns(n, visitors):
-    print('verified')
-else:
-    print(f'Incorrect: Pattern did not match the criteria')
+verify_solution()

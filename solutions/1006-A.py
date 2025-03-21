@@ -22,31 +22,33 @@ The first example is described in the problem statement.
 Tags: implementation,*800
 '''
 
-def mishkas_algorithm(n, array):
-    # Initialize result array
-    result = []
-    
-    # Process each element in the array
-    for element in array:
-        if element % 2 == 0:
-            # Element is even
-            result.append(element - 1)
+def mishkas_algorithm(n, a):
+    # Step 2 and 3
+    b = []
+    for number in a:
+        if number % 2 == 0:
+            b.append(number - 1)
         else:
-            # Element is odd
-            result.append(element + 1)
+            b.append(number + 1)
+    return b
+
+# Verification function
+
+def verify_mishkas_algorithm():
+    # Test case from the problem statement
+    test_n = 5
+    test_a = [1, 2, 4, 5, 10]
+    expected_output = [2, 1, 3, 6, 9]
     
-    return result
+    # Getting the actual output from the solution function
+    actual_output = mishkas_algorithm(test_n, test_a)
+    
+    # Verification
+    if actual_output == expected_output:
+        print('verified')
+    else:
+        print('Test failed!')
+        print(f'Actual Output: {actual_output}')
+        print(f'Expected Output: {expected_output}')
 
-# Test function with an example
-n_test = 5
-array_test = [1, 2, 4, 5, 10]
-expected_result_test = [2, 1, 3, 6, 9]
-
-# Execute the solution function
-actual_result_test = mishkas_algorithm(n_test, array_test)
-
-# Verify the result
-if actual_result_test == expected_result_test:
-    print('verified')
-else:
-    print(f'incorrect result: actual {actual_result_test}, expected {expected_result_test}')
+verify_mishkas_algorithm()

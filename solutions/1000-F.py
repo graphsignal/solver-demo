@@ -18,83 +18,82 @@ If there is no integer such that it occurs in the subarray from index $$$l_i$$$ 
 Tags: datastructures,divideandconquer,*2400
 '''
 
-class MoAlgorithm:
-    def __init__(self, array):
-        self.array = array
-        self.block_size = int(len(array) ** 0.5) + 1
-        self.freq = {}
-        self.current_ans = 0
-        self.unique_items = set()
-        self.result_cache = {}
+def mo_algorithm_solution(n, array, queries):
+    import math
 
-    def add(self, index):
-        val = self.array[index]
-        
-        if val in self.freq:
-            if self.freq[val] == 1:
-                self.unique_items.discard(val)
-                self.current_ans -= 1
-            self.freq[val] += 1
+    # Calculate block size
+    block_size = int(math.sqrt(n))
+
+    # Sort queries based on Mo's order
+    def mo_order(x):
+        block = x[0] // block_size
+        return (block, x[1] if block % 2 == 0 else -x[1])
+
+    queries = [(l-1, r-1, i) for i, (l, r) in enumerate(queries)]  # Convert to 0-based index
+    queries.sort(key=mo_order)
+    
+    # Result list
+    result = [0] * len(queries)
+    
+    # Frequency dictionary
+    freq = {}
+    unique_elements = set()
+
+    # Current range
+    curr_l, curr_r = 0, 0
+
+    def add(x):
+        if x in freq:
+            if freq[x] == 1:
+                unique_elements.discard(x)
+            freq[x] += 1
         else:
-            self.freq[val] = 1
-            self.unique_items.add(val)
-            self.current_ans += 1
-        
-    def remove(self, index):
-        val = self.array[index]
-        
-        if val in self.freq:
-            if self.freq[val] == 1:
-                self.unique_items.discard(val)
-                self.current_ans -= 1
-            self.freq[val] -= 1
-            if self.freq[val] == 1:
-                self.unique_items.add(val)
-                self.current_ans += 1
-            elif self.freq[val] == 0:
-                del self.freq[val]
+            freq[x] = 1
+            unique_elements.add(x)
 
-    def get_answer(self):
-        # Return any item from the set or 0 if empty
-        return next(iter(self.unique_items), 0)
+    def remove(x):
+        if x in freq:
+            if freq[x] == 1:
+                unique_elements.discard(x)
+                del freq[x]
+            else:
+                freq[x] -= 1
+                if freq[x] == 1:
+                    unique_elements.add(x)
 
-    def process_query(self, queries):
-        queries = sorted(queries, key=lambda q: (q[0] // self.block_size, q[1]))
-        l, r, answers = 0, 0, [0] * len(queries)
-        for idx, (ql, qr, qi) in enumerate(queries):
-            while r <= qr:
-                self.add(r)
-                r += 1
-            while l < ql:
-                self.remove(l)
-                l += 1
-            while l > ql:
-                l -= 1
-                self.add(l)
-            while r > qr + 1:
-                r -= 1
-                self.remove(r)
-            # Store the result
-            answers[qi] = self.get_answer()
-        return answers
+    # Initialize
+    # Initial range [curr_l, curr_r] should be empty
+    for l, r, qi in queries:
+        while curr_r <= r:
+            add(array[curr_r])
+            curr_r += 1
+        while curr_r > r + 1:
+            remove(array[curr_r - 1])
+            curr_r -= 1
+        while curr_l < l:
+            remove(array[curr_l])
+            curr_l += 1
+        while curr_l > l:
+            curr_l -= 1
+            add(array[curr_l])
 
-def solution(n, a, q, queries):
-    mo_algo = MoAlgorithm(a)
-    indexed_queries = [(l-1, r-1, i) for i, (l, r) in enumerate(queries)]
-    return mo_algo.process_query(indexed_queries)
+        # Answer the query
+        if unique_elements:
+            result[qi] = next(iter(unique_elements))
+        else:
+            result[qi] = 0
 
-# Test Case
-def verify_result():
-    n = 6
-    a = [1, 1, 2, 3, 2, 4]
-    q = 2
-    queries = [(2, 6), (1, 2)]
-    expected = [3, 0]  # Possible output for first query is 1, 3, or 4
-    result = solution(n, a, q, queries)
-    # Verification
-    if all(res in ([1, 3, 4] if exp == 3 else [0]) for res, exp in zip(result, expected)):
-        print("verified")
+    return result
+
+# Test verification
+def verify_solution():
+    array = [1, 1, 2, 3, 2, 4]
+    queries = [(2, 6), (1, 2)]  # 1-based index queries
+    expected = [1, 0]  # Possible output for queries
+    result = mo_algorithm_solution(len(array), array, queries)
+    if result == expected:
+        print('verified')
     else:
-        print(f"Incorrect: expected {expected}, but got {result}")
+        print(f'incorrect result, got {result}, expected {expected}')
 
-verify_result()
+verify_solution()
